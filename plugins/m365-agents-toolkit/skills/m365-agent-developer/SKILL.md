@@ -1,0 +1,140 @@
+---
+name: m365-agent-developer
+description: >
+  Create, build, and deploy declarative agents for M365 Copilot and Teams. Scaffolds new M365 agent
+  projects, authors JSON manifests, configures capabilities, and manages the full agent lifecycle.
+  Use when creating a new agent, building a Teams agent, or working on any M365 Copilot declarative agent.
+  Triggers: "create agent", "create a declarative agent", "create an agent", "new declarative agent",
+  "create m365 agent", "create Teams agent", "build an agent", "build a declarative agent",
+  "scaffold an agent", "new agent project", "make a copilot agent", "start a new agent",
+  "create a copilot agent", "add a capability", "add a plugin", "configure my agent",
+  "deploy my agent", "provision my agent", "fix my agent manifest", "validate my agent",
+  "edit my agent", "modify my agent", "update my agent instructions", "add conversation starters",
+  "add a web search capability", "add graph connectors", "add an API plugin", "add an MCP plugin"
+---
+
+# M365 Agent Developer
+
+## ⛔ Workspace Check — MANDATORY FIRST STEP
+
+**Before doing ANYTHING, fingerprint the workspace:**
+
+1. Check for `appPackage/declarativeAgent.json` and `m365agents.yml`
+2. Check for non-agent indicators (`package.json` with express/react/next, `src/index.js`, `app.py`, etc.)
+
+**Then follow the decision gate:**
+
+| Condition | Gate | Action |
+|-----------|------|--------|
+| Non-agent project files, no `appPackage/` | **Reject** | Text-only response. No files, no commands. |
+| No manifest, user wants to edit/deploy | **Reject** | Text-only response. Explain manifest is missing. |
+| No manifest, user wants new project | **Scaffold** | → [Scaffolding Workflow](references/scaffolding-workflow.md) |
+| Manifest exists with errors | **Fix** | Run `atk validate --env local`, report errors, ask user. Do NOT deploy. |
+| Valid agent project | **Edit** | → [Editing Workflow](references/editing-workflow.md) |
+
+> **Detailed gate rules, examples, and anti-patterns:** [Workspace Gates](references/workspace-gates.md)
+
+---
+
+## Phase Routing
+
+| Scenario | Workflow Reference |
+|----------|-------------------|
+| Creating a NEW project from scratch | [Scaffolding Workflow](references/scaffolding-workflow.md) |
+| Working with existing `.json` manifests | [Editing Workflow](references/editing-workflow.md) |
+| Adding an API plugin | [API Plugins](references/api-plugins.md) |
+| Adding an MCP server | [MCP Plugin](references/mcp-plugin.md) |
+| Writing agent instructions | [Conversation Design](references/conversation-design.md) |
+
+---
+
+## ATK CLI Setup
+
+Before running any ATK commands, check if the ATK CLI is available by running `atk --version`. If not found, **STOP and tell the user** — do NOT attempt to install it yourself.
+
+All commands use `atk` directly (e.g., `atk provision --env local`).
+
+---
+
+## Critical Rules
+
+### 1. Validate + Deploy After EVERY Edit
+
+After ANY change to files in `appPackage/`, you MUST run both steps before responding:
+
+```bash
+# Step 1: Validate (REQUIRED — always use --env local for validation)
+atk validate --env local
+
+# Step 2: Deploy (REQUIRED — skip ONLY if validation found errors)
+atk provision --env local
+```
+
+- Only `atk validate --env local` counts — no other validation method is acceptable
+- If validation finds errors → **STOP. Fix errors. Re-validate. Do NOT deploy.**
+- Warnings are OK — they don't block deployment
+- Exception: user explicitly asks you not to deploy → validate only
+
+### 2. Never Invent Content
+
+- Do NOT invent placeholder names, descriptions, or instructions
+- If required fields are missing, run `atk validate --env local`, report the gaps, and ASK the user
+- If JSON is malformed, identify the specific issues, ask before fixing, use surgical edits
+
+### 3. Schema Version Compatibility
+
+Before adding ANY feature, read the `version` field in `declarativeAgent.json` and check the [Schema](references/schema.md) feature matrix. If the feature isn't supported in that version, **refuse** and offer to upgrade.
+
+Key version gates:
+- `sensitivity_label`, `worker_agents`, `EmbeddedKnowledge` → **v1.6 only**
+- `Meetings` → **v1.5+**
+- `ScenarioModels`, `behavior_overrides`, `disclaimer` → **v1.4+**
+- `Dataverse`, `TeamsMessages`, `Email`, `People` → **v1.3+**
+
+### 4. Use `atk add action` for API Plugins — NEVER Create Plugin Files Manually
+
+You are **forbidden** from manually creating `ai-plugin.json`, OpenAPI specs, adaptive cards, or editing the `actions` array. Use the CLI:
+
+```bash
+# ⛔ Always list ALL operations in a single call — NEVER run separate calls per operation
+atk add action --api-plugin-type api-spec --openapi-spec-location URL --api-operation "GET /path,POST /path,PATCH /path/{id},DELETE /path/{id}" -i false
+```
+
+Run a **single** `atk add action` call per OpenAPI spec, listing **all** operations as a comma-separated list in `--api-operation`. Never run separate `atk add action` calls for different operations from the same spec — this creates multiple plugins instead of one. If `atk add action` fails, report the error; do NOT fall back to manual creation.
+
+> **Exception:** MCP servers are not supported by `atk add action`. Use the [MCP Plugin workflow](references/mcp-plugin.md) instead.
+
+### 5. MCP Server Integration
+
+When the user mentions an MCP server URL, follow the [MCP Plugin workflow](references/mcp-plugin.md). You MUST run the MCP Inspector to discover actual tools — **NEVER fabricate tool names/descriptions**.
+
+### 6. Always Update Instructions & Starters After Changes
+
+Adding a capability or plugin without updating instructions is incomplete. After ANY change:
+1. Update instructions to describe the new/changed functionality
+2. Add at least 1 conversation starter per added capability/plugin
+3. Remove starters that reference removed capabilities
+
+### 7. App Name Requirement
+
+Always update the app name and description to something meaningful. Never leave defaults like "My Agent".
+
+---
+
+## References
+
+### Shared
+- **[Best Practices](references/best-practices.md)** — Security, performance, testing, compliance
+- **[Conversation Design](references/conversation-design.md)** — Instructions and conversation starters
+- **[Deployment](references/deployment.md)** — ATK CLI workflows, environments, CI/CD
+- **[Workspace Gates](references/workspace-gates.md)** — Detailed gate rules, examples, anti-patterns
+
+### Scaffolding
+- **[Scaffolding Workflow](references/scaffolding-workflow.md)** — Step-by-step scaffolding instructions, naming rules, error handling
+
+### JSON Development
+- **[Editing Workflow](references/editing-workflow.md)** — Step-by-step JSON development instructions
+- **[Schema](references/schema.md)** — Official JSON schema for agent manifests
+- **[API Plugins](references/api-plugins.md)** — OpenAPI integration for JSON agents
+- **[MCP Plugin](references/mcp-plugin.md)** — MCP server integration with RemoteMCPServer
+- **[Examples](references/examples.md)** — JSON manifest examples

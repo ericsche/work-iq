@@ -1,0 +1,8 @@
+{
+  "name": "workiq",
+  "description": "Query Microsoft 365 data with natural language — emails, meetings, documents, Teams messages, and more.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Microsoft"
+  }
+}

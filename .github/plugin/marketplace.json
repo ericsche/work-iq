@@ -1,0 +1,32 @@
+{
+  "name": "work-iq",
+  "metadata": {
+    "version": "1.0.0",
+    "description": "The official Microsoft Work IQ plugin collection"
+  },
+  "owner": {
+    "name": "Microsoft"
+  },
+  "plugins": [
+    {
+      "name": "workiq",
+      "source": "./plugins/workiq",
+      "version": "1.0.0",
+      "description": "Query Microsoft 365 data with natural language — emails, meetings, documents, Teams messages, and more.",
+      "skills": [
+        "./plugins/workiq/skills/workiq"
+      ]
+    },
+    {
+      "name": "m365-agents-toolkit",
+      "source": "./plugins/m365-agents-toolkit",
+      "version": "1.0.0",
+      "description": "Toolkit for building Microsoft 365 Copilot declarative agents — scaffolding, JSON manifest development, and capability configuration.",
+      "skills": [
+        "./plugins/m365-agents-toolkit/skills/install-atk",
+        "./plugins/m365-agents-toolkit/skills/m365-agent-developer",
+        "./plugins/m365-agents-toolkit/skills/ui-widget-developer"
+      ]
+    }
+  ]
+}
