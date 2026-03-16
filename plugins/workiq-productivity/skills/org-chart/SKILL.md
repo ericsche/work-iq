@@ -11,7 +11,7 @@ Render a visual ASCII org chart for any person in the organization. Shows the ta
 
 - "Show me the org chart for Sarah"
 - "Draw the org tree for the Platform team lead"
-- "What does Ramya's org look like?"
+- "What does Nadia's org look like?"
 - "Show my org chart"
 - "Visualize the reporting structure under Alex"
 
@@ -138,16 +138,16 @@ For titles not in this list, abbreviate by removing common words ("of", "the") a
 🏛️ ORG CHART
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                👤 Satya Nadella (CEO)
+                👤 Dana Whitfield (CEO)
                 │
-                👤 Rajesh Jha (EVP, Experiences + Devices)
+                👤 Marcus Reyes (EVP, Products)
                 │
-                👤 Jeff Teper (CVP, Collaborative Apps)
+                👤 Priya Kapoor (CVP, Collaboration)
                 │
                 ┌──────────────────────────────┐
-                │     Chris Taylor              │
+                │     James Holloway            │
                 │     VP Eng                    │
-                │     chris@contoso.com         │
+                │     jamesh@contoso.com        │
                 └──────────────┬───────────────┘
                                │
                 ┌──────────────┴──────────────┐
@@ -167,7 +167,7 @@ For titles not in this list, abbreviate by removing common words ("of", "the") a
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📊 Alex Johnson has 4 direct reports
-   Chain: CEO → Rajesh Jha → Jeff Teper → Chris Taylor → ⭐ Alex Johnson
+   Chain: CEO → Marcus Reyes → Priya Kapoor → James Holloway → ⭐ Alex Johnson
 📧 alexj@contoso.com
 ```
 
@@ -181,17 +181,17 @@ When there are more than 6 direct reports, switch to a **compact list layout** b
 🏛️ ORG CHART
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                👤 Satya Nadella (CEO)
+                👤 Dana Whitfield (CEO)
                 │
-                👤 Rajesh Jha (EVP)
+                👤 Marcus Reyes (EVP)
                 │
                 ┌─────────────────────────────┐
-                │     Gio Della-Libera        │
+                │     Lena Petrova            │
                 │     VP Eng                  │
                 └──────────────┬──────────────┘
                                │
                 ┌──────────────┴──────────────┐
-                │  ⭐ Ramya Subramanya         │
+                │  ⭐ Nadia Okoye              │
                 │  Partner Grp SW Eng Mgr     │
                 └──────────────┬──────────────┘
                                │
@@ -200,21 +200,21 @@ When there are more than 6 direct reports, switch to a **compact list layout** b
 
 👔 MANAGERS (3)
  #  Name                     Title                    Email
- 1  Amitanshu Jha            Prin SW Eng Mgr          amijh@contoso.com
- 2  Anurag Handa             Prin SW Eng Mgr          ahanda@contoso.com
- 3  Rahul Agarwal            SW Eng Mgr               rahula@contoso.com
+ 1  Carlos Mendes            Prin SW Eng Mgr          cmendes@contoso.com
+ 2  Anika Larsen             Prin SW Eng Mgr          alarsen@contoso.com
+ 3  Raj Malhotra             SW Eng Mgr               rmalhotra@contoso.com
 
 🔧 SENIOR ICs (4)
  #  Name                     Title                    Email
- 4  Samrat Gavale            Prin SWE                 sagavale@contoso.com
- 5  Massimo Gatti            Prin SWE                 magatti@contoso.com
- 6  Sushant Srivastava       Prin SWE                 sushant@contoso.com
- 7  Tahir Sousa              Prin SW Eng Mgr          tasousa@contoso.com
+ 4  Tomoko Ishida            Prin SWE                 tishida@contoso.com
+ 5  Felix Brandt             Prin SWE                 fbrandt@contoso.com
+ 6  Maya Chen                Prin SWE                 mchen@contoso.com
+ 7  Omar El-Sayed            Prin SW Eng Mgr          oelsayed@contoso.com
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 Ramya Subramanya has 7 direct reports
-   Chain: CEO → Rajesh Jha → Gio Della-Libera → ⭐ Ramya Subramanya
-📧 Ramya.Subramanya@contoso.com
+📊 Nadia Okoye has 7 direct reports
+   Chain: CEO → Marcus Reyes → Lena Petrova → ⭐ Nadia Okoye
+📧 Nadia.Okoye@contoso.com
 ```
 
 ### Summary Line
@@ -247,7 +247,7 @@ Always end with a summary that includes the full reporting chain:
 - Say "org chart for {name}" to explore anyone in the company.
 - After viewing, you can say "email #3" to contact a specific person, or "schedule a meeting with the managers" to book time.
 - Ask follow-up questions like "find all PMs under Sarah's org" for deeper searches.
-- Say "go deeper on Anurag" to expand a manager's subtree.
+- Say "go deeper on Carlos" to expand a manager's subtree.
 
 ## Examples
 
@@ -261,9 +261,9 @@ Always end with a summary that includes the full reporting chain:
 
 ### Example 2: Look up a colleague by name
 
-**User:** Draw the org chart for Ramya Subramanya
+**User:** Draw the org chart for Nadia Okoye
 
-**Result:** Resolves Ramya via `ask_work_iq`, fetches her manager and direct reports in parallel, walks the chain up to the org root, and renders a wide org chart with a compact list layout (since she has 7 direct reports).
+**Result:** Resolves Nadia via `ask_work_iq`, fetches her manager and direct reports in parallel, walks the chain up to the org root, and renders a wide org chart with a compact list layout (since she has 7 direct reports).
 
 ---
 
