@@ -116,23 +116,23 @@ Aggregate the data into the following metrics:
 
 👤 TOP SENDERS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  #1  Sarah Chen             │ 34 emails │ ████████████████
+  #1  Firstname1 Lastname1    │ 34 emails │ ████████████████
   #2  notifications@jira     │ 28 emails │ █████████████
-  #3  Alex Kim               │ 22 emails │ ██████████
-  #4  Jordan Lee             │ 18 emails │ ████████
+  #3  Firstname2 Lastname2   │ 22 emails │ ██████████
+  #4  Firstname3 Lastname3   │ 18 emails │ ████████
   #5  build-alerts@ci        │ 15 emails │ ███████
-  #6  Priya Sharma           │ 14 emails │ ██████
+  #6  Firstname4 Lastname4   │ 14 emails │ ██████
   #7  calendar@outlook       │ 12 emails │ █████
-  #8  Chris Morgan           │ 10 emails │ ████
+  #8  Firstname5 Lastname5   │ 10 emails │ ████
   #9  newsletter@company     │  9 emails │ ████
   #10 help-desk@contoso      │  7 emails │ ███
 
 👤 TOP RECIPIENTS (your sent mail)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  #1  Sarah Chen             │ 19 emails
-  #2  Alex Kim               │ 14 emails
-  #3  Manager: Pat Davis     │ 11 emails
-  #4  Jordan Lee             │  9 emails
+  #1  Firstname1 Lastname1    │ 19 emails
+  #2  Firstname2 Lastname2   │ 14 emails
+  #3  Manager: Firstname6 Lastname6 │ 11 emails
+  #4  Firstname3 Lastname3   │  9 emails
   #5  Team DL                │  8 emails
 
 📎 ATTACHMENT STATS

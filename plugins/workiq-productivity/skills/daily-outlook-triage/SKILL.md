@@ -143,7 +143,7 @@ Good morning, {Name}! Here's your day at a glance:
 User: "What does my day look like?" or "Help me triage my day" or "Daily outlook summary"
 
 The skill will:
-1. Identify the user (e.g., "Massimo Gatti")
+1. Identify the user (e.g., "Firstname1 Lastname1")
 2. Pull unread/recent inbox emails
 3. Get all meetings scheduled for today
 4. Generate a prioritized triage summary

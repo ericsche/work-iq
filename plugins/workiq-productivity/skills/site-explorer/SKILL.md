@@ -134,9 +134,9 @@ Display items in a table format, using column names as headers. Show the first 2
 📋 LIST: {List Name} — {N} items
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  #   Title              Department   Status   Hiring Manager   Target Start
- 1   Sr. Engineer        Eng          Open     Sarah Kim        Mar 15
- 2   Product Designer    Design       Open     Pat Rivera       Apr 1
- 3   Data Analyst        Analytics    Closed   Jordan Chen      —
+ 1   Sr. Engineer        Eng          Open     Firstname1 Lastname1   Mar 15
+ 2   Product Designer    Design       Open     Firstname2 Lastname2   Apr 1
+ 3   Data Analyst        Analytics    Closed   Firstname3 Lastname3   —
  ...
 
 🛠️ ACTIONS

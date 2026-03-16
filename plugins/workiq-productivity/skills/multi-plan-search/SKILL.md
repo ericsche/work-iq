@@ -12,7 +12,7 @@ Search for tasks across every Planner plan you have access to. Filter by keyword
 - "Find all my urgent tasks across all plans"
 - "Search for tasks about 'API' in any plan"
 - "What's overdue across all my plans?"
-- "Find everything assigned to Sarah across all plans"
+- "Find everything assigned to Firstname1 across all plans"
 - "Show all tasks due this week regardless of plan"
 
 ## Instructions
@@ -127,18 +127,18 @@ Sort results by:
 🔴 URGENT / IMPORTANT ({count})
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  #   Task                       Plan              Assignee        Due         Status
- 1   Fix payment gateway        Sprint 42         Sarah Kim       Mar 5       🔄 In Progress  ⏰
- 2   Security vulnerability     Sprint 42         Jordan Chen     Mar 8       ⬜ Not Started
- 3   Launch prep checklist      Product Launch    You             Mar 10      🔄 In Progress
- 4   API rate limiting          Sprint 42         Pat Rivera      Mar 12      ⬜ Not Started
+ 1   Fix payment gateway        Sprint 42         Firstname1 Lastname1  Mar 5       🔄 In Progress  ⏰
+ 2   Security vulnerability     Sprint 42         Firstname2 Lastname2  Mar 8       ⬜ Not Started
+ 3   Launch prep checklist      Product Launch    You                   Mar 10      🔄 In Progress
+ 4   API rate limiting          Sprint 42         Firstname3 Lastname3  Mar 12      ⬜ Not Started
 
 🟡 MEDIUM / LOW ({count})
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  #   Task                       Plan              Assignee        Due         Status
  5   Update API documentation   Sprint 42         You             Mar 15      ⬜ Not Started
- 6   Design email template      Q1 Marketing      Sarah Kim       Mar 18      🔄 In Progress
+ 6   Design email template      Q1 Marketing      Firstname1 Lastname1  Mar 18      🔄 In Progress
  7   Review onboarding flow     Onboarding        You             Mar 20      ⬜ Not Started
- 8   Social media calendar      Q1 Marketing      Pat Rivera      Mar 22      ⬜ Not Started
+ 8   Social media calendar      Q1 Marketing      Firstname3 Lastname3  Mar 22      ⬜ Not Started
 
 📊 SEARCH SUMMARY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -152,14 +152,14 @@ Sort results by:
 👤 BY ASSIGNEE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   You:           {N} tasks across {N} plans
-  Sarah Kim:     {N} tasks across {N} plans
-  Jordan Chen:   {N} tasks across {N} plans
-  Pat Rivera:    {N} tasks across {N} plans
+  Firstname1 Lastname1:  {N} tasks across {N} plans
+  Firstname2 Lastname2:  {N} tasks across {N} plans
+  Firstname3 Lastname3:  {N} tasks across {N} plans
 
 🛠️ ACTIONS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   "mark #1 complete"           — complete a task
-  "assign #2 to Pat"           — reassign
+  "assign #2 to Firstname3"    — reassign
   "show only overdue"          — refine results
   "search for 'design'"        — new keyword search
   "drill into Sprint 42"       — view plan details
@@ -210,9 +210,9 @@ The skill fetches all tasks from every plan and applies a case-insensitive clien
 ---
 
 **Find everything overdue assigned to a teammate:**
-> "What tasks is Sarah overdue on across all plans?"
+> "What tasks is Firstname1 overdue on across all plans?"
 
-The skill resolves "Sarah" via `ask_work_iq`, queries each plan filtered by assignee, then applies a client-side overdue filter (dueDateTime < today AND status ≠ completed), presenting all overdue items grouped by plan with an assignee summary.
+The skill resolves "Firstname1" via `ask_work_iq`, queries each plan filtered by assignee, then applies a client-side overdue filter (dueDateTime < today AND status ≠ completed), presenting all overdue items grouped by plan with an assignee summary.
 
 ## Error Handling
 

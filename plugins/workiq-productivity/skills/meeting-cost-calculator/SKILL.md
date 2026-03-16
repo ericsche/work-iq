@@ -91,7 +91,7 @@ Compute actionable insights:
 ═══════════════════════════════════════════════════════
 
 📅 Period: July 14 – 18, 2025 (1 week)
-👤 User: Jane Smith
+👤 User: Firstname1 Lastname1
 ⏰ Work week: 40 hours (Mon–Fri, 9 AM – 5 PM PST)
 
 ───────────────────────────────────────────────────────

@@ -94,9 +94,9 @@ This skill is invoked by recipes or orchestration agents — not directly by end
 **Output (sample)**:
 | # | Description | Owner | Due Date | Priority |
 |---|-------------|-------|----------|----------|
-| 1 | Update API docs with new endpoint schema | Priya Sharma | 2026-03-07 | P2 |
-| 2 | Fix login blocker bug before release | Marcus Lee | 2026-03-04 | P1 |
-| 3 | Review UX mocks when you get a chance | [Unresolved: Jordan] | TBD | P3 |
+| 1 | Update API docs with new endpoint schema | Firstname1 Lastname1 | 2026-03-07 | P2 |
+| 2 | Fix login blocker bug before release | Firstname2 Lastname2 | 2026-03-04 | P1 |
+| 3 | Review UX mocks when you get a chance | [Unresolved: Firstname3] | TBD | P3 |
 
 ---
 
