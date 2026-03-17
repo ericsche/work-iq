@@ -12,7 +12,7 @@ work-iq/
 ├── plugins/                  # Plugin packages (skills + MCP servers)
 │   ├── workiq/
 │   ├── microsoft-365-agents-toolkit/
-│   └── repairs-hub/
+│   └── workiq-productivity/
 ├── server.json               # MCP server manifest
 ├── ADMIN-INSTRUCTIONS.md     # Tenant admin consent guide
 ├── CONTRIBUTING.md           # Guide for adding new plugins
@@ -28,7 +28,7 @@ This repo is a [Copilot CLI plugin marketplace](https://docs.github.com/en/copil
 ```bash
 copilot plugin install ./plugins/workiq
 copilot plugin install ./plugins/microsoft-365-agents-toolkit
-copilot plugin install ./plugins/repairs-hub
+copilot plugin install ./plugins/workiq-productivity
 ```
 
 > **Important:** After installing, restart your Copilot CLI session for new skills to become available.
@@ -44,7 +44,7 @@ copilot plugin list
 ```bash
 copilot plugin uninstall workiq
 copilot plugin uninstall microsoft-365-agents-toolkit
-copilot plugin uninstall repairs-hub
+copilot plugin uninstall workiq-productivity
 ```
 
 ## Plugins
@@ -72,8 +72,17 @@ plugins/<plugin-name>/
   - `declarative-agent-developer` skill — Scaffolding, JSON manifest authoring, capability configuration, deployment
   - `ui-widget-developer` skill — Build MCP servers with OpenAI Apps SDK widget rendering for Copilot Chat
 
-- **repairs-hub** — Manage repairs for various items via the Repairs Hub API. Bundles:
-  - `repairs-hub` skill — List, create, and delete repairs using the Repairs Hub REST API
+- **workiq-productivity** — Read-only WorkIQ productivity insights powered by the local WorkIQ CLI. Bundles:
+  - `action-item-extractor` skill — Extract action items with owners, deadlines, and priorities
+  - `daily-outlook-triage` skill — Quick summary of inbox and calendar for the day
+  - `email-analytics` skill — Analyze email patterns (volume, senders, response times)
+  - `meeting-cost-calculator` skill — Calculate time and cost spent in meetings
+  - `org-chart` skill — Visual ASCII org chart for any person
+  - `multi-plan-search` skill — Search tasks across all Planner plans
+  - `site-explorer` skill — Browse SharePoint sites, lists, and libraries
+  - `channel-audit` skill — Audit channels for inactivity and cleanup
+  - `channel-digest` skill — Summarize activity across multiple channels
+  - MCP server (`@microsoft/workiq`) with tools: `ask_work_iq`, `accept_eula`, `get_debug_link`
 
 ## Prerequisites
 

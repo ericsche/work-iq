@@ -41,6 +41,7 @@ copilot
 # 3. Install any plugin
 /plugin install workiq@work-iq
 /plugin install microsoft-365-agents-toolkit@work-iq
+/plugin install workiq-productivity@work-iq
 ```
 
 **That's it!** Restart Copilot CLI and start using the plugin:
