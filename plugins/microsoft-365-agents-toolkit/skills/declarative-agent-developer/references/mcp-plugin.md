@@ -8,22 +8,22 @@ This guide explains how to integrate Model Context Protocol (MCP) servers as act
 
 MCP servers expose tools that can be consumed by your agent. Unlike OpenAPI-based plugins, MCP plugins use a `RemoteMCPServer` runtime type and embed the tool descriptions directly in the plugin manifest.
 
-> **⚠️ IMPORTANT:** `atk add action` does NOT support MCP servers — it only supports `--api-plugin-type api-spec` for OpenAPI plugins. MCP plugins MUST be created manually following the steps below. This is NOT a violation of the "Always Use `atk add action`" rule — that rule applies only to OpenAPI/REST API plugins.
+> **⚠️ IMPORTANT:** `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` does NOT support MCP servers — it only supports `--api-plugin-type api-spec` for OpenAPI plugins. MCP plugins MUST be created manually following the steps below. This is NOT a violation of the "Always Use `npx -y --package @microsoft/m365agentstoolkit-cli atk add action`" rule — that rule applies only to OpenAPI/REST API plugins.
 
 ## Prerequisites
 
 - MCP server URL (must be accessible via HTTP/HTTPS)
 - Node.js installed (for `mcp-remote` authentication helper)
-- Logo images for the agent (color.png 192×192 and outline.png 32×32) — see [Step 5: Logo Images](#step-5-logo-images)
+- Logo images for the agent (color.png 192×192 and outline.png 32×32) — optional, see [Step 5: Logo Images](#step-5-logo-images-optional)
 
 ---
 
 ## Scaffold the Agent Project First
 
-Before adding an MCP plugin, you **must** have a scaffolded agent project. Run `atk new` if you haven't already:
+Before adding an MCP plugin, you **must** have a scaffolded agent project. Run `npx -y --package @microsoft/m365agentstoolkit-cli atk new` if you haven't already:
 
 ```bash
-atk new \
+npx -y --package @microsoft/m365agentstoolkit-cli atk new \
   -n my-agent \
   -c declarative-agent \
   -i false
@@ -39,7 +39,7 @@ This creates `m365agents.yml` (and `m365agents.local.yml`) with the **5 required
 | 4 | `teamsApp/update` | Uploads the package to Teams |
 | 5 | `teamsApp/extendToM365` | **Extends the app to M365 Copilot** — generates `M365_TITLE_ID` |
 
-**What breaks without `extendToM365`:** If this step is missing, `atk provision` will register the Teams app and generate `TEAMS_APP_ID`, but the agent will **never appear in Copilot Chat** because no `M365_TITLE_ID` is generated. This is the most common reason for "provision succeeded but agent not found" failures.
+**What breaks without `extendToM365`:** If this step is missing, `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` will register the Teams app and generate `TEAMS_APP_ID`, but the agent will **never appear in Copilot Chat** because no `M365_TITLE_ID` is generated. This is the most common reason for "provision succeeded but agent not found" failures.
 
 > **If you already have a project** but are missing `teamsApp/extendToM365`, add it to the `provision` lifecycle in `m365agents.yml` after `teamsApp/update`. See [deployment.md](deployment.md) for the full provisioning reference.
 
@@ -81,18 +81,22 @@ If the server requires OAuth (detected in Step 2), perform a one-time authentica
 Tell the user:
 > "I need to authenticate with [name]'s MCP server. A browser window will open — please sign in."
 
+Run the command **interactively** (NOT backgrounded — do NOT append `&` or redirect to files):
+
 ```bash
 npx -p mcp-remote@latest mcp-remote-client <MCP_SERVER_URL> --port 3334
 ```
+
+Wait for it to complete. The command will open a browser for OAuth sign-in and then exit once authentication succeeds.
 
 > **WSL / headless environments:** `mcp-remote` starts a local HTTP server for the OAuth callback and tries to open a browser. In WSL, the browser opens on the Windows host but the `http://127.0.0.1:3334/...` callback URL may not route back to WSL. If the browser opens but authentication seems stuck:
 > 1. After signing in, copy the full callback URL from the browser (it will show an error or blank page)
 > 2. Run `curl '<callback-url>'` inside WSL to deliver the auth code to mcp-remote
 > 3. Alternatively, run `export BROWSER=wslview` before the command so WSL's browser opener is used, which handles the redirect correctly
 
-Wait for it to complete. The token is cached at `~/.mcp-auth/mcp-remote-*/{hash}_tokens.json`.
+**⛔ IMPORTANT:** Do NOT look for tokens in `/tmp/` or log files. Tokens are ONLY stored at `~/.mcp-auth/`.
 
-**Read the cached access token:**
+**Read the cached access token from `~/.mcp-auth`:**
 
 ```bash
 ls ~/.mcp-auth/mcp-remote-*/
@@ -190,16 +194,6 @@ EXTRACT_TOOLS
 **Include ALL tools** returned by `tools/list` in the plugin manifest. Do NOT filter or exclude tools unless the developer explicitly asks to limit the tool set.
 
 Tell the user how many tools were discovered and confirm they will all be included.
-
-#### 3d. Clean Up Cached Tokens
-
-After tool discovery is complete and you have all the information needed, **immediately** delete the cached tokens:
-
-```bash
-rm -rf ~/.mcp-auth
-```
-
-**⛔ Security:** Do NOT leave tokens behind. The `~/.mcp-auth` directory must be removed as soon as tool discovery finishes — before proceeding to manifest creation.
 
 ### Step 4: Create the Plugin Manifest
 
@@ -302,7 +296,13 @@ For each tool:
         "type": "AdaptiveCard",
         "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
         "version": "1.6",
-        "body": []
+        "body": [
+          {
+            "type": "TextBlock",
+            "text": "${if(title, title, description)}",
+            "wrap": true
+          }
+        ]
       }
     }
   }
@@ -316,25 +316,25 @@ For each tool:
 - Source name comes from `name_for_human` automatically — do NOT add it as a TextBlock
 - `data_path` and field paths are connector-specific — derive them from the tool's actual response structure
 
-### Step 5: Logo Images
+### Step 5: Logo Images (Optional)
 
-Logo images are **required** for all agent packages. You need two formats:
+Logos are **not mandatory**. The default logos from `npx -y --package @microsoft/m365agentstoolkit-cli atk new` work fine. Ask the user casually:
+
+> "Would you like to use a custom logo for [name], or is the default fine?"
+
+If the user **does not** have a logo or says to skip → **move on**. Do NOT block the workflow for logos.
+
+If the user **does** want a custom logo, they need two **PNG** files (no JPG, SVG, or other formats):
 
 - **`color.png`** — 192×192 px, full colour
 - **`outline.png`** — 32×32 px, white-on-transparent
-
-Ask the user:
-> "Do you have logo images for [name]? I need two formats:
-> - **color.png** — 192×192 px, full colour
-> - **outline.png** — 32×32 px, white-on-transparent
->
-> You can provide a URL to download from, provide local file paths, or I can download the official logo automatically."
 
 **Resolving logo inputs — check in this order:**
 
 1. **URL**: If the user provides a URL, download the image with `curl -L -o <tempfile> <url>`.
 2. **Local file path**: If the user provides a path, use it directly.
-3. **Auto-download**: If the user provides nothing, search the web for the official logo of [name], find a square colour logo, and download it.
+
+**If the provided image is not PNG, convert it to PNG before processing.**
 
 **Handling missing formats:**
 - If the user provides only one image, ask: "I have your [color/outline] logo. For the [other format], would you like to provide it, or shall I generate it automatically?"
@@ -439,18 +439,17 @@ Add the plugin to your `declarative-agent.json`:
 ## Complete Workflow Checklist
 
 ```
-□ Step 0: Scaffold agent project with `atk new` (if not already scaffolded)      ← MANDATORY
+□ Step 0: Scaffold agent project with `npx -y --package @microsoft/m365agentstoolkit-cli atk new` (if not already scaffolded)      ← MANDATORY
 □ Step 1: Get MCP server URL from user
 □ Step 2: Detect authentication requirements (probe well-known endpoints)
 □       → If OAuth: follow authentication.md (discover endpoints, get creds, configure oauth/register)
 □ Step 3: Discover tools via MCP protocol (initialize → tools/list)               ← MANDATORY
 □       → Include ALL tools (do not filter unless developer explicitly requests it)
 □ Step 4: Create {name}-plugin.json with functions + response_semantics
-□ Step 5: Process logo images (color.png 192×192, outline.png 32×32)
+□ Step 5: Ask user about custom logo (optional — skip if user declines)
 □ Step 6: Add runtime with RemoteMCPServer type (OAuthPluginVault or None)
 □ Step 7: Register plugin in declarativeAgent.json
-□ Step 8: Run atk validate --env local
-□ Step 9: Run atk provision --env local --interactive false
+□ Step 8: Run npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local --interactive false
 ```
 
 ---
@@ -477,7 +476,7 @@ For the Microsoft Learn MCP server at `https://learn.microsoft.com/api/mcp`:
     {
       "name": "microsoft_docs_fetch",
       "description": "Fetch and convert a Microsoft Learn documentation page to markdown format.",
-      "capabilities": { "response_semantics": { "data_path": "$", "properties": {}, "static_template": { "type": "AdaptiveCard", "$schema": "https://adaptivecards.io/schemas/adaptive-card.json", "version": "1.6", "body": [] } } }
+      "capabilities": { "response_semantics": { "data_path": "$", "properties": {}, "static_template": { "type": "AdaptiveCard", "$schema": "https://adaptivecards.io/schemas/adaptive-card.json", "version": "1.6", "body": [{ "type": "TextBlock", "text": "${if(title, title, description)}", "wrap": true }] } } }
     }
   ],
   "runtimes": [
@@ -550,8 +549,8 @@ You can integrate multiple MCP servers by adding multiple runtimes, each with it
 ```json
 {
   "functions": [
-    { "name": "docs_search", "description": "Search Microsoft docs.", "capabilities": { "response_semantics": { "data_path": "$", "properties": {}, "static_template": { "type": "AdaptiveCard", "$schema": "https://adaptivecards.io/schemas/adaptive-card.json", "version": "1.6", "body": [] } } } },
-    { "name": "search", "description": "Search authenticated service.", "capabilities": { "response_semantics": { "data_path": "$", "properties": {}, "static_template": { "type": "AdaptiveCard", "$schema": "https://adaptivecards.io/schemas/adaptive-card.json", "version": "1.6", "body": [] } } } }
+    { "name": "docs_search", "description": "Search Microsoft docs.", "capabilities": { "response_semantics": { "data_path": "$", "properties": {}, "static_template": { "type": "AdaptiveCard", "$schema": "https://adaptivecards.io/schemas/adaptive-card.json", "version": "1.6", "body": [{ "type": "TextBlock", "text": "${if(title, title, description)}", "wrap": true }] } } } },
+    { "name": "search", "description": "Search authenticated service.", "capabilities": { "response_semantics": { "data_path": "$", "properties": {}, "static_template": { "type": "AdaptiveCard", "$schema": "https://adaptivecards.io/schemas/adaptive-card.json", "version": "1.6", "body": [{ "type": "TextBlock", "text": "${if(title, title, description)}", "wrap": true }] } } } }
   ],
   "runtimes": [
     {
@@ -569,18 +568,6 @@ You can integrate multiple MCP servers by adding multiple runtimes, each with it
   ]
 }
 ```
-
----
-
-## Validation Notes
-
-When running `atk validate --env local` on projects with MCP plugins, you may see:
-
-- `Unrecognized member 'type' with value 'RemoteMCPServer'`
-- `Unrecognized member 'auth'`
-- `Unrecognized member 'spec'`
-
-These are **known false positives** — the ATK validator schema predates `RemoteMCPServer` support. Safe to ignore; do NOT surface to the user as errors. Proceed to provision if these are the only issues.
 
 ---
 
@@ -605,4 +592,4 @@ These are **known false positives** — the ATK validator schema predates `Remot
 4. **Match function names exactly** — copy tool names directly from the tools/list output
 5. **Always add response semantics** — every function must have `capabilities.response_semantics`, even if using the default (empty body) pattern
 6. **Include all tools by default** — inline every tool from `tools/list` unless the developer explicitly asks to limit the set; for all included tools always keep the full description and inputSchema
-7. **Process logos before provisioning** — the agent package requires `color.png` (192×192) and `outline.png` (32×32) in `appPackage/`
+7. **Logos are optional** — ask the user if they want a custom logo; if not, use the defaults from `npx -y --package @microsoft/m365agentstoolkit-cli atk new`. Logos must be **PNG only** (no JPG, SVG, etc.)

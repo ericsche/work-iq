@@ -12,33 +12,32 @@ API plugins (also called "actions") allow your M365 Copilot agent to interact wi
 
 ---
 
-## ⛔ Post-`atk add action` Checklist — MANDATORY
+## ⛔ Post-`npx -y --package @microsoft/m365agentstoolkit-cli atk add action` Checklist — MANDATORY
 
-After running `atk add action`, you **MUST** complete ALL of these before validating and deploying:
+After running `npx -y --package @microsoft/m365agentstoolkit-cli atk add action`, you **MUST** complete ALL of these before validating and deploying:
 
 1. **Update `name_for_human`** in ai-plugin.json — descriptive, user-facing name (max 20 chars)
 2. **Update `description_for_model`** in ai-plugin.json — detailed guidance for the AI on when and how to use each function
 3. **Customize adaptive cards** in `appPackage/adaptiveCards/` for each operation — different layouts per HTTP verb (list view for GET collections, detail view for GET by ID, confirmation for DELETE, etc.)
 4. **Add `confirmation` dialogs** for all destructive operations (POST, PUT, PATCH, DELETE)
-5. **Validate** all touched files with `atk validate --env local`
-6. **Deploy** with `atk provision --env local --interactive false`
+5. **Deploy** with `npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local --interactive false`
 
-Skipping ANY of these steps = incomplete work. The `atk add action` command generates scaffolding — **you must finish the job** by customizing every generated file.
+Skipping ANY of these steps = incomplete work. The `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` command generates scaffolding — **you must finish the job** by customizing every generated file.
 
 ---
 
 ## Adding API Plugins with ATK CLI
 
-> **⚠️ IMPORTANT:** When adding an API, OpenAPI spec, or REST API to your agent, you **MUST** use the `atk add action` command. This is the required method for adding API plugins to M365 Copilot agents. **Do NOT manually create plugin files** - the path resolution between local packaging and M365 service validation is complex and error-prone.
+> **⚠️ IMPORTANT:** When adding an API, OpenAPI spec, or REST API to your agent, you **MUST** use the `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` command. This is the required method for adding API plugins to M365 Copilot agents. **Do NOT manually create plugin files** - the path resolution between local packaging and M365 service validation is complex and error-prone.
 
-> **⛔ ONE PLUGIN PER API — HARD RULE:** Always add ALL operations from the same OpenAPI spec in a **single** `atk add action` call. List every operation in the `--api-operation` parameter as a comma-separated list. **NEVER** run separate `atk add action` calls for different operations from the same spec — this creates multiple plugins instead of one unified plugin. One OpenAPI spec = one `atk add action` call = one plugin.
+> **⛔ ONE PLUGIN PER API — HARD RULE:** Always add ALL operations from the same OpenAPI spec in a **single** `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` call. List every operation in the `--api-operation` parameter as a comma-separated list. **NEVER** run separate `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` calls for different operations from the same spec — this creates multiple plugins instead of one unified plugin. One OpenAPI spec = one `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` call = one plugin.
 
-### The `atk add action` Command
+### The `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` Command
 
 **ALWAYS use this command** when asked to add an API, OpenAPI specification, or REST API to an M365 Copilot agent:
 
 ```bash
-atk add action \
+npx -y --package @microsoft/m365agentstoolkit-cli atk add action \
   --api-plugin-type api-spec \
   --openapi-spec-type enter-url-or-open-local-file \
   --openapi-spec-location URL_OR_FILE_PATH \
@@ -77,7 +76,7 @@ The `--api-operation` parameter uses the format: `METHOD /path,METHOD /path,...`
 
 **Example with Repairs API (URL):**
 ```bash
-atk add action \
+npx -y --package @microsoft/m365agentstoolkit-cli atk add action \
   --api-plugin-type api-spec \
   --openapi-spec-type enter-url-or-open-local-file \
   --openapi-spec-location "https://repairshub.azurewebsites.net/openapi.json" \
@@ -87,7 +86,7 @@ atk add action \
 
 **Example with local file (absolute path):**
 ```bash
-atk add action \
+npx -y --package @microsoft/m365agentstoolkit-cli atk add action \
   --api-plugin-type api-spec \
   --openapi-spec-type enter-url-or-open-local-file \
   --openapi-spec-location /home/user/myproject/nhl-openapi.json \
@@ -97,7 +96,7 @@ atk add action \
 
 ### What the Command Creates
 
-After running `atk add action`, the following files are created/updated:
+After running `npx -y --package @microsoft/m365agentstoolkit-cli atk add action`, the following files are created/updated:
 
 ```
 appPackage/
@@ -116,7 +115,7 @@ appPackage/
 
 ### Post-Generation: Enhance the Plugin
 
-After running `atk add action`, you **MUST** enhance the generated files:
+After running `npx -y --package @microsoft/m365agentstoolkit-cli atk add action`, you **MUST** enhance the generated files:
 
 1. **Update `name_for_human`** - Make it descriptive and user-friendly
 2. **Update `description_for_model`** - Add detailed guidance on when and how to use each function
@@ -135,11 +134,11 @@ The `description_for_model` is critical - it tells the AI when to use each funct
 
 ### 🎨 Post-Generation: Enhance Adaptive Cards for Each Action
 
-The `atk add action` command auto-generates basic adaptive cards in `appPackage/adaptiveCards/` — one per operation. These default cards are generic and only display raw data. **You MUST customize each card** to provide a valuable UX tailored to the data each action returns.
+The `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` command auto-generates basic adaptive cards in `appPackage/adaptiveCards/` — one per operation. These default cards are generic and only display raw data. **You MUST customize each card** to provide a valuable UX tailored to the data each action returns.
 
 #### ⚠️ CRITICAL: Check ALL Operations Have Adaptive Cards
 
-After running `atk add action`, **verify that an adaptive card exists for EVERY operation**. The command may not generate cards for POST, PATCH, or DELETE operations. **If any operation is missing an adaptive card, CREATE one manually** in `appPackage/adaptiveCards/`.
+After running `npx -y --package @microsoft/m365agentstoolkit-cli atk add action`, **verify that an adaptive card exists for EVERY operation**. The command may not generate cards for POST, PATCH, or DELETE operations. **If any operation is missing an adaptive card, CREATE one manually** in `appPackage/adaptiveCards/`.
 
 - **GET operations** → List or detail layout showing returned data
 - **POST operations** → Confirmation/summary layout showing what was created
@@ -1108,7 +1107,7 @@ Content-Type: application/json
 
 ```bash
 # Provision the agent
-atk provision --env local --interactive false
+npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local --interactive false
 
 # Use the returned test URL to test in M365 Copilot
 ```
@@ -1163,9 +1162,9 @@ Test with various prompts:
 | Timeout errors | API response too slow | Optimize API, add caching, increase timeout |
 | Schema mismatch | Plugin expects different response format | Update OpenAPI spec to match actual API response |
 | "No operations selected" | Empty `--api-operation` parameter | Specify operations in correct format: `METHOD /path` |
-| "File not found" during `atk add action` | Relative path used for local OpenAPI spec | **Use absolute path**: `/full/path/to/openapi.json` |
-| "File not found in zip archive" during provision | Manual plugin creation with incorrect spec path | **Use `atk add action` command** - do not manually create plugins |
-| OpenAPI spec path resolution fails | Path conflicts between zipAppPackage and M365 service | The ATK CLI handles this correctly - always use `atk add action` |
+| "File not found" during `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` | Relative path used for local OpenAPI spec | **Use absolute path**: `/full/path/to/openapi.json` |
+| "File not found in zip archive" during provision | Manual plugin creation with incorrect spec path | **Use `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` command** - do not manually create plugins |
+| OpenAPI spec path resolution fails | Path conflicts between zipAppPackage and M365 service | The ATK CLI handles this correctly - always use `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` |
 
 ### Why Manual Plugin Creation Fails
 
@@ -1174,7 +1173,7 @@ If you try to manually create API plugin files, you'll encounter path resolution
 1. **zipAppPackage** resolves spec paths relative to the plugin file location
 2. **M365 extendToM365** resolves spec paths relative to the zip archive root
 
-These different resolution strategies make manual path configuration nearly impossible. The `atk add action` command handles this complexity automatically by:
+These different resolution strategies make manual path configuration nearly impossible. The `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` command handles this complexity automatically by:
 - Placing the OpenAPI spec in `apiSpecificationFile/`
 - Using the correct relative path `apiSpecificationFile/openapi.yaml` in the plugin
 - Ensuring the zip archive structure matches the path expectations

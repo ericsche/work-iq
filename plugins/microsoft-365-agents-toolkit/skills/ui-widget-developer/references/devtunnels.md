@@ -119,7 +119,7 @@ devtunnel host "$TUNNEL_NAME" 2>&1 | while IFS= read -r line; do
       echo "   MCP_SERVER_URL=$TUNNEL_URL"
       echo "   MCP_SERVER_DOMAIN=$TUNNEL_DOMAIN"
       echo ""
-      echo "NOTE: First-time setup — run 'atk provision --env local' to deploy the agent."
+      echo "NOTE: First-time setup — run 'npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local' to deploy the agent."
       echo ""
     fi
   fi
@@ -189,7 +189,7 @@ devtunnel host $tunnelName 2>&1 | ForEach-Object {
             Write-Host "   MCP_SERVER_URL=$tunnelUrl"
             Write-Host "   MCP_SERVER_DOMAIN=$tunnelDomain"
             Write-Host ""
-            Write-Host "NOTE: First-time setup - run 'atk provision --env local' to deploy the agent."
+            Write-Host "NOTE: First-time setup - run 'npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local' to deploy the agent."
             Write-Host ""
         }
     }
@@ -307,7 +307,7 @@ The script will:
 On the **first run**, deploy the agent once:
 
 ```bash
-npx -p @microsoft/m365agentstoolkit-cli@latest atk provision --env local
+npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local
 ```
 
 On **subsequent runs**, the tunnel URL is the same — just restart the tunnel and MCP server. No re-provisioning needed unless you change the agent manifest (mcpPlugin.json, declarativeAgent.json, etc.).
@@ -318,7 +318,7 @@ Random tunnels (`devtunnel host -p 3001`) generate a new URL every time. This cr
 
 1. New tunnel → new URL
 2. `.env.local` must be updated → MCP server must restart (new CSP headers)
-3. Agent manifest has old URL → must re-provision with `atk provision`
+3. Agent manifest has old URL → must re-provision with `npx -y --package @microsoft/m365agentstoolkit-cli atk provision`
 
 With named tunnels, the URL is **stable across restarts**. Create once, reuse forever:
 
@@ -339,7 +339,7 @@ devtunnel host my-mcp-agent
 | CSP errors in Copilot | Verify `MCP_SERVER_DOMAIN` matches tunnel domain in `.env.local` |
 | Server not accessible through tunnel | Ensure MCP server is running before starting tunnel |
 | Permission denied on script | Run `chmod +x scripts/setup-devtunnel.sh` |
-| Agent not updated after manifest change | Bump version in manifest.json and redeploy with `atk provision` |
+| Agent not updated after manifest change | Bump version in manifest.json and redeploy with `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` |
 | `EADDRINUSE` port conflict | Previous server instance still running. Windows: `taskkill //PID <pid> //F`. Linux/Mac: `lsof -ti:<port> \| xargs kill -9` |
 | DevTunnel login fails with CA policy error | Tenant Conditional Access blocks device code auth on managed devices. Use GitHub auth: `devtunnel user login -g -d` |
 | Named tunnel already exists with wrong config | Delete and recreate: `devtunnel delete <name>` then re-run the setup script |

@@ -21,35 +21,29 @@ This skill activates when the user asks to:
 
 ## Behavior
 
-**IMPORTANT: Always check if ATK is already installed before running `npm install`.** Running `npm install -g` concurrently from multiple agents/evals will cause corruption. Only install when ATK is missing or the user explicitly asks to update.
+ATK CLI commands use `npx -y --package @microsoft/m365agentstoolkit-cli atk` which automatically downloads and runs the latest version — no global installation is needed.
 
 When triggered, determine what the user wants:
 
 | User intent | Action |
 |-------------|--------|
-| Install/update **everything** or just "ATK" | Check + install both CLI and VSIX |
-| Install/update **CLI** only | Check + install CLI only |
+| Install/update **everything** or just "ATK" | Verify CLI works + install VSIX |
+| Install/update **CLI** only | Verify CLI works (npx handles it automatically) |
 | Install/update **extension** / **VSIX** only | Install VSIX only |
-| Ambiguous | Check + install both CLI and VSIX |
+| Ambiguous | Verify CLI works + install VSIX |
 
 ## Commands
 
-### Step 1: Check if ATK CLI is already installed
+### Step 1: Verify ATK CLI works
 
 ```bash
-atk --version 2>/dev/null
+npx -y --package @microsoft/m365agentstoolkit-cli atk --version
 ```
 
-- **If this succeeds** (prints a version): ATK is already installed. **Skip the npm install step** unless the user explicitly asked to update/upgrade.
-- **If this fails** (command not found): Proceed to install.
+- **If this succeeds** (prints a version): ATK CLI is available. The `npx` prefix automatically downloads the latest package on first use and caches it for subsequent runs.
+- **If this fails**: Check that Node.js 18+ and npm are installed. The `npx` command requires a working Node.js environment.
 
-### Step 2: Install ATK CLI (only if missing or user asked to update)
-
-```bash
-npm install -g @microsoft/m365agentstoolkit-cli@rc
-```
-
-### Step 3: ATK VS Code Extension (if requested)
+### Step 2: ATK VS Code Extension (if requested)
 
 ```bash
 code --install-extension TeamsDevApp.ms-teams-vscode-extension
@@ -57,14 +51,12 @@ code --install-extension TeamsDevApp.ms-teams-vscode-extension
 
 ## Execution
 
-1. **Check** if ATK CLI is already available with `atk --version`
-2. **Skip install** if already present (unless user explicitly wants an update)
-3. Run the appropriate install command(s) only if needed
-4. Report the result (already installed / newly installed / failure)
-5. Verify with `atk --version`
+1. **Verify** ATK CLI works by running `npx -y --package @microsoft/m365agentstoolkit-cli atk --version`
+2. Report the result (version number / failure)
+3. Install VS Code extension if requested
+4. Explain that all ATK commands use the `npx -y --package @microsoft/m365agentstoolkit-cli atk` prefix — no global install needed
 
 ## Safety Rules
 
-- **MUST** run the CLI install before the VSIX install when installing both
 - **MUST NOT** skip errors — report failures clearly to the user
 - **MUST** use the exact package names and extension IDs above — do not substitute with other names or links

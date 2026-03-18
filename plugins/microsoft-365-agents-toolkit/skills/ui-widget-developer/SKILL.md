@@ -125,7 +125,7 @@ When provisioning is needed:
 1. **Bump the version** in `manifest.json` (increment the patch version, e.g., `1.0.0` → `1.0.1`)
 2. **Deploy the agent:**
    ```bash
-   npx -p @microsoft/m365agentstoolkit-cli@latest atk provision --env local
+   npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local
    ```
 
 **WIDGET TESTING LINKS:** Every time you return to the user with a result while the MCP server is running, you MUST include links to ALL widgets so they can test them locally. Format:

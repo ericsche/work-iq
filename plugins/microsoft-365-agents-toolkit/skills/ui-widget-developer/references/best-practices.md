@@ -216,7 +216,7 @@ See the **Security** section in [widget-patterns.md](widget-patterns.md) for the
 
 Use **named tunnels** for stable URLs that persist across restarts. See [devtunnels.md](devtunnels.md) for complete setup scripts and command reference.
 
-Key behavior: the URL stays the same across restarts, so `atk provision` is only needed once (and again only when the agent manifest changes — mcpPlugin.json, declarativeAgent.json, etc.).
+Key behavior: the URL stays the same across restarts, so `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` is only needed once (and again only when the agent manifest changes — mcpPlugin.json, declarativeAgent.json, etc.).
 
 ## 12. Declarative Agent Capabilities
 

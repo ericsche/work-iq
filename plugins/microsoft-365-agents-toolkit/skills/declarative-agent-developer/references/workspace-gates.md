@@ -10,7 +10,7 @@ This document contains detailed rules for workspace detection, gate scenarios, a
 
 1. **If `declarativeAgent.json` does NOT exist and the user asked to edit/modify/add/deploy → REJECT.** Respond with text only. Do NOT create the file. Do NOT create `appPackage/`. Do NOT look at other directories for examples to copy.
 2. **If `declarativeAgent.json` has malformed JSON → DETECT first, then INFORM, then ASK.** You must parse the file and report errors to the user BEFORE making any edits. Never edit a broken file without first telling the user it's broken.
-3. **If validation finds errors → NEVER run `atk provision`.** There are zero exceptions. Report errors and ask the user.
+3. **If validation finds errors → NEVER run `npx -y --package @microsoft/m365agentstoolkit-cli atk provision`.** There are zero exceptions. Report errors and ask the user.
 
 **The "Detect → Inform → Ask" protocol is mandatory for ALL error states:**
 - **Detect**: Identify the problem (missing file, parse error, validation error)
@@ -49,8 +49,8 @@ No `appPackage/declarativeAgent.json` exists but user implies an existing agent 
 - ❌ Creating `declarativeAgent.json` from scratch to "help" the user
 - ❌ Creating the `appPackage/` directory
 - ❌ Looking at other directories/fixtures for examples and copying them
-- ❌ Running `atk new` when the user asked to edit (editing ≠ scaffolding)
-- ❌ Running ANY `atk` command — the project is not an agent project
+- ❌ Running `npx -y --package @microsoft/m365agentstoolkit-cli atk new` when the user asked to edit (editing ≠ scaffolding)
+- ❌ Running ANY `npx -y --package @microsoft/m365agentstoolkit-cli atk` command — the project is not an agent project
 
 **Example rejection:**
 ```
@@ -75,27 +75,27 @@ User explicitly says "create a new agent", "scaffold", "start from scratch". The
 `declarativeAgent.json` exists but has validation errors.
 
 **Rules:**
-- Run `atk validate --env local` to get the full error report
+- Parse and check `declarativeAgent.json` against the expected schema
 - Report ALL errors to the user with specific details
 - ASK the user before making changes
-- **Do NOT** run `atk provision` — fix errors first, no exceptions
+- **Do NOT** run `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` — fix errors first, no exceptions
 - **Do NOT** silently rewrite the entire file — surgical fixes only
 - **Do NOT** invent placeholder values for missing required fields
 
-**Special case — mostly empty manifest** (has `$schema` and `version` but no `name`, `description`, or `instructions`): This is Gate 4. Run `atk validate --env local`, report missing fields, ASK the user. Do NOT invent values.
+**Special case — mostly empty manifest** (has `$schema` and `version` but no `name`, `description`, or `instructions`): This is Gate 4. Report missing fields, ASK the user. Do NOT invent values.
 
 **Malformed JSON handling — STRICT ORDER (do NOT skip steps or reorder):**
 1. **DETECT**: Read the file and attempt to parse it. Identify all syntax errors.
 2. **INFORM**: Tell the user the file has malformed JSON BEFORE making any edits. List every syntax issue you found (missing commas, unclosed brackets, trailing commas, etc.) with line numbers.
 3. **ASK**: Ask the user if you should fix the syntax errors. Wait for their response.
 4. **FIX** (only after user confirms): Fix with surgical edits (not a rewrite — if you're changing >20% of lines, stop and reconsider)
-5. **VALIDATE**: Run `atk validate --env local` after fixing
-6. **DO NOT DEPLOY**: Even after fixing, do NOT run `atk provision` until the user's original request is also addressed and validation passes cleanly
+5. **VALIDATE**: Check the manifest against the schema after fixing
+6. **DO NOT DEPLOY**: Even after fixing, do NOT run `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` until the user's original request is also addressed and validation passes cleanly
 
 **⛔ Malformed JSON anti-patterns that WILL cause eval failure:**
 - ❌ Reading the file and immediately editing it without telling the user it's broken
 - ❌ Fixing JSON errors as part of a larger edit (fix syntax → inform → ask, THEN handle the user's request separately)
-- ❌ Running `atk provision` after fixing syntax errors
+- ❌ Running `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` after fixing syntax errors
 - ❌ Validating AFTER editing instead of detecting errors BEFORE editing
 - ❌ Mentioning malformed JSON only in a summary at the end instead of upfront
 
@@ -109,10 +109,10 @@ User explicitly says "create a new agent", "scaffold", "start from scratch". The
 
 | Scenario | What you see | What you MUST do | What you MUST NOT do |
 |----------|-------------|-----------------|---------------------|
-| Express/React/Node app | `package.json` + `src/index.js` but NO `appPackage/` | Text-only: tell user this is NOT an agent project | ❌ Create `appPackage/` ❌ Run `atk new` ❌ Create ANY files |
+| Express/React/Node app | `package.json` + `src/index.js` but NO `appPackage/` | Text-only: tell user this is NOT an agent project | ❌ Create `appPackage/` ❌ Run `npx -y --package @microsoft/m365agentstoolkit-cli atk new` ❌ Create ANY files |
 | No manifest, edit request | No `declarativeAgent.json`, user says "add capability" | Text-only: explain manifest is missing | ❌ Create files ❌ Scaffold ❌ "Help" by creating missing files |
-| Manifest missing fields | `declarativeAgent.json` missing `name`/`description`/`instructions` | Run `atk validate --env local`, list ALL missing fields, ASK user | ❌ Invent placeholders ❌ Auto-fill ❌ Run `atk provision` |
-| Manifest has errors | `atk validate --env local` reports errors | Report ALL errors, suggest fixes, ask user | ❌ Silently fix ❌ Deploy ❌ Auto-correct |
+| Manifest missing fields | `declarativeAgent.json` missing `name`/`description`/`instructions` | List ALL missing fields, ASK user | ❌ Invent placeholders ❌ Auto-fill ❌ Run `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` |
+| Manifest has errors | Manifest has structural/schema errors | Report ALL errors, suggest fixes, ask user | ❌ Silently fix ❌ Deploy ❌ Auto-correct |
 
 ---
 
@@ -136,14 +136,12 @@ These will cause eval failure:
 - ❌ Mentioning "the file had malformed JSON" only in a final summary
 
 **Deployment violations:**
-- ❌ Running `atk provision` when validation found errors — not even "to test"
-- ❌ Running `atk provision` "to see what happens"
+- ❌ Running `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` when validation found errors — not even "to test"
+- ❌ Running `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` "to see what happens"
 - ❌ Auto-correcting errors and deploying without asking
 - ❌ Deploying "for educational purposes" to show error output
-- ❌ Using any manual JSON parsing instead of `atk validate --env local`
 
 **"EVEN IF..." — No exceptions to the deploy block:**
 - EVEN IF deploying would "demonstrate the error" — just report errors
-- EVEN IF the user says "deploy this" — validation errors override. Explain why.
-- EVEN IF the user says "validate and deploy" — deploy ONLY IF validation passes
-- EVEN IF you fixed errors yourself — re-validate FIRST, deploy only if clean
+- EVEN IF the user says "deploy this" — if you know there are errors, explain why you can't
+- EVEN IF you fixed errors yourself — verify the JSON is valid before deploying

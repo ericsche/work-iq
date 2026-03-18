@@ -43,7 +43,7 @@ Where `<SERVER_ROOT>` is the scheme + host of the server URL (e.g., `https://mcp
 | `authorizationUrl` | `authorization_endpoint` |
 | `tokenUrl` | `token_endpoint` |
 | `refreshUrl` | `token_endpoint` (same endpoint handles refresh grants) |
-| `scope` | `scopes_supported` → join with comma (e.g., `"openid,email,profile"`). If no scopes are discovered or provided, default to `"openid"` |
+| `scope` | `scopes_supported` → join with comma (e.g., `"openid,email,profile"`). If no scopes are discovered or provided, default to `"openid"`. **If `scope` has no value, it MUST be quoted as `""`** — a bare `scope:` with no value is YAML null, not an empty string, and will fail schema validation. |
 
 ### If discovered
 
@@ -138,6 +138,8 @@ provision:
       tokenUrl: <tokenUrl>
       refreshUrl: <refreshUrl>
       scope: <comma-separated-scopes or "openid" if none provided>
+      # ⚠️ If scope has no value, use `scope: ""` (quoted empty string).
+      # A bare `scope:` is YAML null and will fail schema validation.
       flow: authorizationCode
       identityProvider: Custom
       isPKCEEnabled: <true or false>
@@ -185,6 +187,8 @@ TEAMSFX_ENV=dev
 ```
 
 > **Important:** Add `<PREFIX>_MCP_AUTH_ID=` to `.env.dev` as soon as you detect the server requires OAuth — before running provision. The `oauth/register` step will populate its value during provisioning.
+>
+> **⛔ NEVER set a placeholder value** for `<PREFIX>_MCP_AUTH_ID` (e.g., `PLACEHOLDER`, `TODO`, `temp`). Leave it empty (`<PREFIX>_MCP_AUTH_ID=`). The `oauth/register` automation will write the real value during provisioning. If a placeholder is present, it will be treated as the actual value and will NOT be overwritten.
 
 ---
 

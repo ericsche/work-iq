@@ -457,4 +457,4 @@ After the MCP server is running:
 2. **Configure the agent** - Use the `m365-json-agent-developer` skill to set up:
    - `mcpPlugin.json` with `RemoteMCPServer` runtime
    - `declarativeAgent.json` with capabilities and actions
-3. **Deploy** - Run `atk provision --env local`
+3. **Deploy** - Run `npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local`

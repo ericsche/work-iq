@@ -20,46 +20,18 @@ When developing an agent, you MUST ALWAYS update the app name and description in
 
 ## 🚨 CRITICAL DEPLOYMENT RULE 🚨
 
-When making ANY edits to an agent — including instructions, conversation starters, capabilities, plugins, or any file in `appPackage/` — you MUST ALWAYS validate and deploy using `atk provision --env local --interactive false` before returning to the user. This applies to EVERY turn, not just the final turn. Never return to the user with undeployed changes.
+When making ANY edits to an agent — including instructions, conversation starters, capabilities, plugins, or any file in `appPackage/` — you MUST ALWAYS deploy using `npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local --interactive false` before returning to the user. This applies to EVERY turn, not just the final turn. Never return to the user with undeployed changes.
 
 **You must NEVER:**
 - Skip deploy because "it's just instructions" — deploy after every change
-- Tell the user to "run `atk provision` yourself" — YOU must run it
+- Tell the user to "run `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` yourself" — YOU must run it
 - Deploy when validation found errors — not even "to test" or "to demonstrate"
 - Deploy "to show the user what happens" when there are errors — just report the errors
-- Run `atk provision` "for educational purposes" to demonstrate failure — errors = STOP, not a teaching moment
+- Run `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` "for educational purposes" to demonstrate failure — errors = STOP, not a teaching moment
 
 **Only exception:** The user explicitly asks you NOT to deploy. Only the user can opt out, never you.
 
 ---
-
-## 🛡️ VALIDATION GATE — MANDATORY BEFORE EVERY DEPLOY 🛡️
-
-After editing any files in the `appPackage/` folder, you MUST validate before deployment.
-
-**How to validate:** Run the validation command once — it validates the entire project:
-
-```bash
-atk validate --env local
-```
-
-**Rules:**
-- 🚫 **ERRORS = HARD BLOCK.** If validation reports any **errors**, you MUST fix them before running `atk provision`. **DO NOT DEPLOY WITH ERRORS. EVER.**
-- ⚠️ **Warnings are OK.** Warnings do not block deployment but should be reviewed and addressed when reasonable.
-- ✅ **Validate after every change.** Run `atk validate --env local` after making changes.
-- 🚫 **`--env local` is mandatory** for validation. Never use `--env dev` for validation.
-- 🚫 **If validation fails, report the error.** Do NOT use any manual JSON parsing as a substitute.
-
-**Decision tree after running `atk validate --env local`:**
-1. **ERRORS found** → STOP. Fix all errors. Re-validate. DO NOT run `atk provision`.
-2. **Only WARNINGS** → Proceed to `atk provision --env local --interactive false`.
-3. **Clean (no errors, no warnings)** → Proceed to `atk provision --env local --interactive false`.
-
-**What to check for:**
-- Schema validation errors (missing required fields, wrong types, invalid values)
-- Reference errors (broken file paths, missing plugin references)
-- Structural errors (malformed JSON, invalid property names)
-- Capability configuration errors (invalid scoping, unsupported combinations)
 
 ---
 
@@ -73,7 +45,7 @@ Every agent needs meaningful conversation starters that help users understand wh
 
 **This is NOT optional.** Adding a capability without updating instructions is incomplete work.
 
-When you add, remove, or modify ANY capability or plugin, you MUST complete ALL of these steps before validating and deploying:
+When you add, remove, or modify ANY capability or plugin, you MUST complete ALL of these steps before deploying:
 
 1. **Update `instructions`** — Add a section describing what the new capability/plugin enables. For removals, delete all references to the removed capability.
 2. **Add conversation starters** — Add at least 1 new conversation starter per added capability or plugin. Each starter should demonstrate the new functionality.
@@ -122,28 +94,24 @@ When you add, remove, or modify ANY capability or plugin, you MUST complete ALL 
 **Action:** Configure the agent using JSON manifest files:
 - Edit `declarativeAgent.json` to define agent properties
 - Configure capabilities with appropriate scoping
-- Set up API plugin integrations using `atk add action` (**NEVER manually create plugin files**)
+- Set up API plugin integrations using `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` (**NEVER manually create plugin files**)
 - Write clear instructions and conversation starters
 - Ensure proper JSON syntax and schema compliance
 
-**After EACH edit action above, immediately run:**
+**After ALL edits, immediately run:**
 ```bash
-atk validate --env local
+npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local --interactive false
 ```
-**After ALL edits + validations pass, immediately run:**
-```bash
-atk provision --env local --interactive false
-```
-These two commands are part of the edit — not a separate optional step. If you edited `declarativeAgent.json`, you MUST run `atk validate --env local`. If you edited `instruction.txt`, you MUST run `atk validate --env local`. Then deploy. Editing without validating and deploying is like writing code without saving the file — the work is not done.
+This command is part of the edit — not a separate optional step. Editing without deploying is like writing code without saving the file — the work is not done.
 
-**⛔ API Plugin Rule — HARD RULE, NO EXCEPTIONS:** To add an API plugin, you MUST use `atk add action` — one command per OpenAPI spec with **ALL operations included in a single call**. Never run separate `atk add action` calls for different operations from the same spec — this creates multiple plugins instead of one. You are FORBIDDEN from manually creating `ai-plugin.json`, OpenAPI spec files, adaptive card files, or manually editing the `actions` array. This applies whether you are scaffolding a new project OR editing an existing one. If the workspace already has an agent and the user says "add an API plugin", you STILL must use `atk add action`. If `atk add action` fails, report the error — do NOT fall back to manual file creation. **Manual plugin file creation = automatic eval failure.**
+**⛔ API Plugin Rule — HARD RULE, NO EXCEPTIONS:** To add an API plugin, you MUST use `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` — one command per OpenAPI spec with **ALL operations included in a single call**. Never run separate `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` calls for different operations from the same spec — this creates multiple plugins instead of one. You are FORBIDDEN from manually creating `ai-plugin.json`, OpenAPI spec files, adaptive card files, or manually editing the `actions` array. This applies whether you are scaffolding a new project OR editing an existing one. If the workspace already has an agent and the user says "add an API plugin", you STILL must use `npx -y --package @microsoft/m365agentstoolkit-cli atk add action`. If `npx -y --package @microsoft/m365agentstoolkit-cli atk add action` fails, report the error — do NOT fall back to manual file creation. **Manual plugin file creation = automatic eval failure.**
 
 ```bash
 # ✅ The ONLY way to add an API plugin — ALL operations in ONE call:
-atk add action --api-plugin-type api-spec --openapi-spec-location <URL> --api-operation "GET /path,POST /path,PATCH /path/{id},DELETE /path/{id}" -i false
+npx -y --package @microsoft/m365agentstoolkit-cli atk add action --api-plugin-type api-spec --openapi-spec-location <URL> --api-operation "GET /path,POST /path,PATCH /path/{id},DELETE /path/{id}" -i false
 ```
 
-**After adding a plugin with `atk add action`, you MUST complete ALL of these — skipping any step is an eval failure:**
+**After adding a plugin with `npx -y --package @microsoft/m365agentstoolkit-cli atk add action`, you MUST complete ALL of these — skipping any step is an eval failure:**
 
 **🔌 POST-PLUGIN MANDATORY STEPS (do ALL of these, in order):**
 1. **Customize `ai-plugin.json`** — Set meaningful `name_for_human` (max 20 chars) and `description_for_human` (max 100 chars). Set a descriptive `description_for_model` on each function. NEVER leave defaults.
@@ -163,43 +131,39 @@ atk add action --api-plugin-type api-spec --openapi-spec-location <URL> --api-op
 **Reference:** [schema.md](schema.md) for proper manifest structure
 **Reference:** [api-plugins.md](api-plugins.md) for adaptive card enhancement guidelines after adding a plugin
 
-**⚠️ IMPORTANT:** After making any edits to JSON files, you MUST validate all changed files with `atk validate --env local` (see Validation Gate above) and then deploy the agent (Step 4) before returning to the user.
+**⚠️ IMPORTANT:** After making any edits to JSON files, you MUST deploy the agent (Step 4) before returning to the user.
 
 **⛔ MANDATORY POST-EDIT CHECKPOINT — YOU ARE NOT DONE YET:**
-After editing ANY file in `appPackage/`, you MUST complete BOTH steps below before responding to the user. Skipping either one is an eval failure:
-1. **Validate** — Run `atk validate --env local` once (it validates the entire project). No other validation method is acceptable. If it reports errors → fix them and re-validate. Do NOT proceed to step 2 with errors.
-2. **Deploy** — Run `atk provision --env local --interactive false`. If you edited files but did not run this command, your work is incomplete. The only exception is if validation found errors (then you MUST fix errors first) or the user explicitly asked you not to deploy.
+After editing ANY file in `appPackage/`, you MUST deploy before responding to the user. Skipping this is an eval failure:
+- **Deploy** — Run `npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local --interactive false`. If you edited files but did not run this command, your work is incomplete. The only exception is if the user explicitly asked you not to deploy.
 
-If you are about to respond to the user and you have NOT run both commands above, **STOP and run them now**.
-
-### Step 3.5: Validate Edited Files
-
-**Action:** Before deploying, run validation once — it covers the entire project:
-
-```bash
-atk validate --env local
-```
-
-- 🚫 **If there are ERRORS → STOP. Fix all errors before proceeding to Step 4.**
-- ⚠️ Warnings are acceptable and do not block deployment
-- 🔧 **If `atk validate --env local` crashes or returns no useful output:** Report the CLI failure to the user. Do NOT substitute any manual JSON parsing — it is never an acceptable replacement.
+If you are about to respond to the user and you have NOT deployed, **STOP and deploy now**.
 
 ### Step 4: Provision and Deploy
 
-**⛔ PRE-DEPLOY CHECK:** Before running the command below, ask yourself: "Did `atk validate --env local` report ANY errors?" If yes → **DO NOT RUN `atk provision`.** Go back to Step 3.5, fix the errors, and re-validate. There are NO exceptions to this rule — not "to see what happens", not "to demonstrate the failure", not "to test if it would work anyway".
+**⛔ PRE-DEPLOY CHECK:** Before running the command below, verify the JSON files are syntactically correct and have the required fields. If there are known errors → fix them first before deploying.
 
 **Action:** Provision required Azure resources and register the agent:
 ```bash
-atk provision --env local --interactive false
+npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local --interactive false
 ```
 
 **Result:** Returns a test URL like `https://m365.cloud.microsoft/chat/?titleId=T_abc123xyz`
 
 **Note:** JSON-based agents do not require a compilation step - changes are deployed directly.
 
-**✅ After successful provision, always provide the test URL to the user:**
+**✅ After successful provision, ALWAYS present the review UX with the test link:**
 
-> "Your agent is deployed and available for testing at the following test URL: {TEST_URL}."
+Read `M365_TITLE_ID` from `env/.env.local` and output:
+
+```
+✅ Agent deployed successfully!
+
+🚀 Test Your Agent in M365 Copilot:
+🔗 https://m365.cloud.microsoft/chat/?titleId={M365_TITLE_ID}
+```
+
+**⛔ Never respond without this link.** If you deployed, the test link MUST appear in your response. This is not optional.
 
 Then wait for the user's response.
 
@@ -216,7 +180,7 @@ Then wait for the user's response.
 
 **Action:** Deploy to staging/production environments:
 ```bash
-atk provision --env prod --interactive false
+npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env prod --interactive false
 ```
 
 **Reference:** [deployment.md](deployment.md) for environment management and CI/CD patterns
@@ -226,10 +190,10 @@ atk provision --env prod --interactive false
 **Action:** Package and share the agent:
 ```bash
 # Package the agent
-atk provision --env dev --interactive false
+npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env dev --interactive false
 
 # Share to tenant (for shared agents)
-atk share --scope tenant --env dev
+npx -y --package @microsoft/m365agentstoolkit-cli atk share --scope tenant --env dev
 ```
 
 ---
@@ -240,15 +204,17 @@ atk share --scope tenant --env dev
 
 **RULE:** When making any changes to an agent (JSON manifest files, instructions, capabilities, API plugins), you MUST complete the following workflow before returning to the user:
 
-1. **Validate:** Run `atk validate --env local` once (validates the entire project).
-   - If any file has **ERRORS** → **STOP. Fix all errors. Re-validate. DO NOT proceed to step 2.**
-   - If only **warnings** → Proceed.
-2. Provision/deploy the agent: `atk provision --env local --interactive false`
-3. Confirm deployment succeeded and provide the test URL
+1. Provision/deploy the agent: `npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local --interactive false`
+2. Read `M365_TITLE_ID` from `env/.env.local`
+3. Present the review UX with the test link:
+   ```
+   ✅ Agent deployed successfully!
 
-🚫 **NEVER run `atk provision` if ANY file has validation ERRORS.** This is a hard rule with no exceptions.
+   🚀 Test Your Agent in M365 Copilot:
+   🔗 https://m365.cloud.microsoft/chat/?titleId={M365_TITLE_ID}
+   ```
 
-**Note:** JSON-based agents do not require compilation - validate then deploy directly after editing.
+**⛔ Never respond without this link after deploying.**
 
 ### Always Clean Up Unused Files
 
@@ -268,11 +234,10 @@ atk share --scope tenant --env dev
 
 **STOP.** Before writing your response to the user, verify ALL of the following:
 
-- [ ] I ran `atk validate --env local` once after all edits
-- [ ] All validation passed with **no errors** (warnings are OK)
-- [ ] I ran `atk provision --env local --interactive false` and it succeeded
-- [ ] I did NOT use any manual JSON parsing as a substitute for `atk validate --env local`
+- [ ] I ran `npx -y --package @microsoft/m365agentstoolkit-cli atk provision --env local --interactive false` and it succeeded
+- [ ] I read `M365_TITLE_ID` from `env/.env.local`
+- [ ] I presented the review UX with the `🚀 Test Your Agent in M365 Copilot:` link
 
-**If you cannot check ALL four boxes, you are NOT done.** Go back and complete the missing steps.
+**If you cannot check ALL boxes, you are NOT done.** Go back and complete the missing steps.
 
-This checklist applies to **EVERY turn** — not just the last turn in a multi-turn conversation. Even if you "only edited instructions," you must validate and deploy before responding.
+This checklist applies to **EVERY turn** — not just the last turn in a multi-turn conversation. Even if you "only edited instructions," you must deploy before responding.
