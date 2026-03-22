@@ -1,19 +1,17 @@
 ---
 name: declarative-agent-developer
 description: >
-  Create, build, and deploy declarative agents for M365 Copilot and Teams. Scaffolds new M365 agent
-  projects, authors JSON manifests, configures capabilities, and manages the full agent lifecycle.
-  Use when creating a new agent, building a Teams agent, or working on any M365 Copilot declarative agent.
-  Triggers: "create agent", "create a declarative agent", "new declarative agent",
-  "create m365 agent", "create Teams agent", "build an agent", "build a declarative agent",
-  "scaffold an agent", "new agent project", "make a copilot agent", "create a copilot agent",
+  Create, build, deploy, and localize declarative agents for M365 Copilot and Teams.
+  USE THIS SKILL for ANY task involving a declarative agent — including localization,
+  scaffolding, editing manifests, adding capabilities, and deploying.
+  Localization requires tokenized manifests and language files that only this skill knows how to produce.
+  Trigger phrases include "create agent", "create a declarative agent", "new declarative agent",
+  "scaffold an agent", "new agent project", "make a copilot agent",
   "add a capability", "add a plugin", "configure my agent", "deploy my agent",
-  "provision my agent", "fix my agent manifest", "edit my agent",
-  "modify my agent", "update my agent instructions", "add conversation starters",
-  "add a web search capability", "add graph connectors", "add an API plugin", "add an MCP plugin",
-  "add OAuth to my plugin", "MCP authentication", "add logo to my agent",
-  "localize my agent", "add localization", "translate my agent", "add a language",
-  "add language support", "multi-language agent", "localization"
+  "fix my agent manifest", "edit my agent", "modify my agent",
+  "localize this agent", "localize my agent", "add localization",
+  "translate my agent", "add a language", "multi-language agent",
+  "add an API plugin", "add an MCP plugin", "add OAuth to my plugin", "add logo to my agent"
 ---
 
 # M365 Agent Developer
@@ -75,6 +73,7 @@ When you encounter ANY problem (missing files, malformed JSON, validation errors
 | Adding an MCP server | [MCP Plugin](references/mcp-plugin.md) |
 | Adding OAuth to an MCP or API plugin | [Authentication](references/authentication.md) |
 | Localizing an agent into multiple languages | [Localization](references/localization.md) |
+| Adding a new language to an already-localized agent | [Localization](references/localization.md) |
 | Writing agent instructions | [Conversation Design](references/conversation-design.md) |
 
 ---
