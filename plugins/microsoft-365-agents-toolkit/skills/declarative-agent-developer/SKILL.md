@@ -11,7 +11,9 @@ description: >
   "provision my agent", "fix my agent manifest", "edit my agent",
   "modify my agent", "update my agent instructions", "add conversation starters",
   "add a web search capability", "add graph connectors", "add an API plugin", "add an MCP plugin",
-  "add OAuth to my plugin", "MCP authentication", "add logo to my agent"
+  "add OAuth to my plugin", "MCP authentication", "add logo to my agent",
+  "localize my agent", "add localization", "translate my agent", "add a language",
+  "add language support", "multi-language agent", "localization"
 ---
 
 # M365 Agent Developer
@@ -72,6 +74,7 @@ When you encounter ANY problem (missing files, malformed JSON, validation errors
 | Adding an API plugin | [API Plugins](references/api-plugins.md) |
 | Adding an MCP server | [MCP Plugin](references/mcp-plugin.md) |
 | Adding OAuth to an MCP or API plugin | [Authentication](references/authentication.md) |
+| Localizing an agent into multiple languages | [Localization](references/localization.md) |
 | Writing agent instructions | [Conversation Design](references/conversation-design.md) |
 
 ---
@@ -163,6 +166,7 @@ Always update the app name and description to something meaningful. Never leave 
 - **[Best Practices](references/best-practices.md)** — Security, performance, testing, compliance
 - **[Conversation Design](references/conversation-design.md)** — Instructions and conversation starters
 - **[Deployment](references/deployment.md)** — ATK CLI workflows, environments, CI/CD
+- **[Localization](references/localization.md)** — Multi-language support, tokenized manifests, language files
 - **[Workspace Gates](references/workspace-gates.md)** — Detailed gate rules, examples, anti-patterns
 
 ### Scaffolding

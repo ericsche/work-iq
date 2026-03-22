@@ -290,3 +290,113 @@ A complete agent combining all features:
   }
 }
 ```
+
+---
+
+## Example 10: Localized Agent
+
+A declarative agent with tokenized strings for multi-language support.
+
+### Tokenized `declarativeAgent.json`
+
+```json
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.6/schema.json",
+  "version": "v1.6",
+  "name": "[[agent_name]]",
+  "description": "[[agent_description]]",
+  "instructions": "$[file]('instructions.txt')",
+  "conversation_starters": [
+    {
+      "title": "[[starter_status_title]]",
+      "text": "[[starter_status_text]]"
+    },
+    {
+      "title": "[[starter_kb_title]]",
+      "text": "[[starter_kb_text]]"
+    }
+  ],
+  "disclaimer": {
+    "text": "[[disclaimer_text]]"
+  }
+}
+```
+
+### `manifest.json` with `localizationInfo`
+
+```json
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/vDevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
+  "localizationInfo": {
+    "defaultLanguageTag": "en",
+    "defaultLanguageFile": "en.json",
+    "additionalLanguages": [
+      {
+        "languageTag": "fr",
+        "file": "fr.json"
+      }
+    ]
+  },
+  "name": {
+    "short": "Support Agent",
+    "full": "Customer Support Agent"
+  },
+  "description": {
+    "short": "Get help with support issues",
+    "full": "An agent that helps resolve customer support issues using internal knowledge bases."
+  },
+  "copilotAgents": {
+    "declarativeAgents": [
+      {
+        "id": "declarativeAgent",
+        "file": "declarativeAgent.json"
+      }
+    ]
+  }
+}
+```
+
+### Default language file (`en.json`)
+
+```json
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/vDevPreview/MicrosoftTeams.Localization.schema.json",
+  "name.short": "Support Agent",
+  "name.full": "Customer Support Agent",
+  "description.short": "Get help with support issues",
+  "description.full": "An agent that helps resolve customer support issues using internal knowledge bases.",
+  "localizationKeys": {
+    "agent_name": "Customer Support Agent",
+    "agent_description": "An agent that helps resolve customer support issues using internal knowledge bases.",
+    "starter_status_title": "Check ticket status",
+    "starter_status_text": "What is the status of my open tickets?",
+    "starter_kb_title": "Search knowledge base",
+    "starter_kb_text": "How do I reset my password?",
+    "disclaimer_text": "This agent provides general support guidance. For urgent issues, contact the helpdesk."
+  }
+}
+```
+
+### French language file (`fr.json`)
+
+```json
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/vDevPreview/MicrosoftTeams.Localization.schema.json",
+  "name.short": "Agent de support",
+  "name.full": "Agent de support client",
+  "description.short": "Obtenez de l'aide pour vos problèmes",
+  "description.full": "Un agent qui aide à résoudre les problèmes de support client à l'aide des bases de connaissances internes.",
+  "localizationKeys": {
+    "agent_name": "Agent de support client",
+    "agent_description": "Un agent qui aide à résoudre les problèmes de support client à l'aide des bases de connaissances internes.",
+    "starter_status_title": "Vérifier le statut du ticket",
+    "starter_status_text": "Quel est le statut de mes tickets ouverts ?",
+    "starter_kb_title": "Rechercher la base de connaissances",
+    "starter_kb_text": "Comment réinitialiser mon mot de passe ?",
+    "disclaimer_text": "Cet agent fournit des conseils de support généraux. Pour les problèmes urgents, contactez le service d'assistance."
+  }
+}
+```
+
+**Reference:** [localization.md](localization.md) for the full localization workflow
