@@ -2,16 +2,7 @@
 
 > Browse, install, and discover skills from the Work IQ plugin marketplace for GitHub Copilot CLI.
 
-This page is the central reference for every plugin published in the **Work IQ** marketplace.
-
-### What's in a plugin?
-
-Each plugin can contain one or both of the following:
-
-- **Skills** — AI-guided workflows defined in `SKILL.md` files. Skills teach Copilot *how* to accomplish a task (e.g., "triage my inbox", "scaffold a declarative agent"). A plugin must include at least one skill.
-- **MCP servers** — [Model Context Protocol](https://modelcontextprotocol.io/) servers defined in a `.mcp.json` file. MCP servers expose **tools** that Copilot can call at runtime to fetch live data or perform actions (e.g., querying Microsoft 365 emails, accepting a EULA). When a plugin includes an MCP server, installing the plugin automatically registers the server so its tools are available in your Copilot session.
-
-> **In short:** Skills tell Copilot *what to do*; MCP servers give Copilot *the tools to do it*.
+This page is the central reference for every plugin published in the **Work IQ** marketplace. Each plugin bundles one or more **skills** (AI-guided workflows) and may include an **MCP server** that exposes tools to your Copilot session.
 
 ---
 
@@ -82,11 +73,11 @@ copilot plugin uninstall workiq-productivity
 
 ## 📦 Plugin Directory
 
-| # | Plugin | Skills | MCP Server | Description |
-|---|--------|--------|------------|-------------|
-| 1 | [**workiq**](#workiq) | 1 | ✅ `@microsoft/workiq` | Query Microsoft 365 data with natural language |
-| 2 | [**microsoft-365-agents-toolkit**](#microsoft-365-agents-toolkit) | 3 | — | Toolkit for building M365 Copilot declarative agents |
-| 3 | [**workiq-productivity**](#workiq-productivity) | 9 | ✅ `@microsoft/workiq` | Read-only productivity insights across M365 |
+| # | Plugin | Skills | Description |
+|---|--------|--------|-------------|
+| 1 | [**workiq**](#workiq) | 1 | Query Microsoft 365 data with natural language |
+| 2 | [**microsoft-365-agents-toolkit**](#microsoft-365-agents-toolkit) | 3 | Toolkit for building M365 Copilot declarative agents |
+| 3 | [**workiq-productivity**](#workiq-productivity) | 9 | Read-only productivity insights across M365 |
 
 ---
 
@@ -96,7 +87,15 @@ copilot plugin uninstall workiq-productivity
 
 **Install:** `/plugin install workiq@work-iq`
 **Source:** [`plugins/workiq/`](./plugins/workiq/)
-**MCP Server:** `@microsoft/workiq` — tools: `ask_work_iq`, `accept_eula`, `get_debug_link`
+
+### MCP Servers
+
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=workiq&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40microsoft%2Fworkiq%22%2C%22mcp%22%5D%7D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_Server-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=workiq&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40microsoft%2Fworkiq%22%2C%22mcp%22%5D%7D&quality=insiders)
+
+| Server | Tools |
+|--------|-------|
+| `@microsoft/workiq` | `ask_work_iq`, `accept_eula`, `get_debug_link` |
 
 ### Skills
 
@@ -131,7 +130,6 @@ copilot plugin uninstall workiq-productivity
 
 **Install:** `/plugin install microsoft-365-agents-toolkit@work-iq`
 **Source:** [`plugins/microsoft-365-agents-toolkit/`](./plugins/microsoft-365-agents-toolkit/)
-**MCP Server:** None (skills only)
 
 ### Skills
 
@@ -157,7 +155,15 @@ copilot plugin uninstall workiq-productivity
 
 **Install:** `/plugin install workiq-productivity@work-iq`
 **Source:** [`plugins/workiq-productivity/`](./plugins/workiq-productivity/)
-**MCP Server:** `@microsoft/workiq` — tools: `ask_work_iq`, `accept_eula`, `get_debug_link`
+
+### MCP Servers
+
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=workiq&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40microsoft%2Fworkiq%22%2C%22mcp%22%5D%7D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_Server-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=workiq&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40microsoft%2Fworkiq%22%2C%22mcp%22%5D%7D&quality=insiders)
+
+| Server | Tools |
+|--------|-------|
+| `@microsoft/workiq` | `ask_work_iq`, `accept_eula`, `get_debug_link` |
 
 ### Skills
 
