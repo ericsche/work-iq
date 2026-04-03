@@ -2,13 +2,13 @@
 
 <#
 .SYNOPSIS
-  Provisions the Work IQ Tools service principal and grants admin consent
+  Provisions Work IQ MCP Server service principals and grants admin consent
   for the Work IQ CLI in your tenant.
 
 .DESCRIPTION
   Resolves AADSTS650052 ("your organization lacks a service principal")
-  by creating the missing service principal for the Work IQ Tools resource,
-  then granting admin consent for the Work IQ CLI application.
+  by creating the missing service principals for the Work IQ MCP Server
+  resources, then granting admin consent for the Work IQ CLI application.
 
 .PARAMETER ConsentOnly
   Skip service principal creation if already provisioned.
@@ -19,33 +19,50 @@
 #>
 
 param(
-    [switch]$ConsentOnly
+    [switch]$ConsentOnly,
+    [switch]$UseDeviceCode
 )
 
 $ErrorActionPreference = 'Stop'
 
 # App IDs
 $WorkIqCliAppId   = 'ba081686-5d24-4bc6-a0d6-d034ecffed87'
-$WorkIqToolsAppId = 'ea9ffc3e-8a23-4a7d-836d-234d7c7565c1'
+
+# Work IQ MCP Server resource AppIds
+$McpServers = @(
+    @{ Name = 'Work IQ Tools';              AppId = 'ea9ffc3e-8a23-4a7d-836d-234d7c7565c1' }
+    @{ Name = 'mcp_MailTools';              AppId = '16b1878d-62c7-4009-aa25-68989d63bbad' }
+    @{ Name = 'mcp_MeServer';              AppId = '147dc821-b413-44c0-8009-1a3098378012' }
+    @{ Name = 'mcp_CalendarTools';          AppId = '910333d2-47e9-43ca-981f-6df2f4531ef4' }
+    @{ Name = 'mcp_TeamsServer';            AppId = 'ce5029ee-c1d3-45c0-bdcc-efb5a4245687' }
+    @{ Name = 'mcp_OneDriveRemoteServer';   AppId = 'b0b2a2bb-6361-4549-a00c-a018417eb8e2' }
+    @{ Name = 'mcp_SharePointRemoteServer'; AppId = '292cff14-c0e8-4116-9e3b-99934ae05766' }
+    @{ Name = 'mcp_AdminTools';             AppId = '2dbeefeb-6462-48a4-abe6-1c4989699319' }
+    @{ Name = 'mcp_WordServer';             AppId = 'c2d0c2b6-8013-4346-9f8b-b81d3b754a29' }
+    @{ Name = 'mcp_M365Copilot';            AppId = 'ab7c82de-7946-4454-ac28-70249d17c95e' }
+)
 
 # Connect with required scopes
 Write-Host "Connecting to Microsoft Graph..." -ForegroundColor Cyan
-Connect-MgGraph -Scopes 'Application.ReadWrite.All','DelegatedPermissionGrant.ReadWrite.All'
+$connectParams = @{ Scopes = 'Application.ReadWrite.All','DelegatedPermissionGrant.ReadWrite.All' }
+if ($UseDeviceCode) { $connectParams['UseDeviceCode'] = $true }
+Connect-MgGraph @connectParams
 
 $context = Get-MgContext
 Write-Host "Connected to tenant: $($context.TenantId)" -ForegroundColor Green
 
-# --- Step 1: Provision Work IQ Tools service principal ---
+# --- Step 1: Provision MCP Server service principals ---
 if (-not $ConsentOnly) {
-    Write-Host "`nChecking for Work IQ Tools service principal..." -ForegroundColor Cyan
-    $toolsSp = Get-MgServicePrincipal -Filter "appId eq '$WorkIqToolsAppId'" -ErrorAction SilentlyContinue
-
-    if ($toolsSp) {
-        Write-Host "Work IQ Tools service principal already exists (Id: $($toolsSp.Id))" -ForegroundColor Green
-    } else {
-        Write-Host "Creating Work IQ Tools service principal..." -ForegroundColor Yellow
-        $toolsSp = New-MgServicePrincipal -AppId $WorkIqToolsAppId
-        Write-Host "Created successfully (Id: $($toolsSp.Id))" -ForegroundColor Green
+    Write-Host "`nProvisioning MCP Server service principals..." -ForegroundColor Cyan
+    foreach ($server in $McpServers) {
+        $sp = Get-MgServicePrincipal -Filter "appId eq '$($server.AppId)'" -ErrorAction SilentlyContinue
+        if ($sp) {
+            Write-Host "  $($server.Name) already exists (Id: $($sp.Id))" -ForegroundColor Green
+        } else {
+            Write-Host "  Creating $($server.Name)..." -ForegroundColor Yellow
+            $sp = New-MgServicePrincipal -AppId $server.AppId
+            Write-Host "  Created $($server.Name) (Id: $($sp.Id))" -ForegroundColor Green
+        }
     }
 }
 
@@ -84,29 +101,31 @@ if ($existingGrant) {
 }
 Write-Host "Graph permissions granted." -ForegroundColor Green
 
-# --- Step 4: Grant admin consent for Work IQ Tools permissions ---
-Write-Host "`nGranting admin consent for Work IQ Tools permissions..." -ForegroundColor Cyan
-$toolsSp = Get-MgServicePrincipal -Filter "appId eq '$WorkIqToolsAppId'"
+# --- Step 4: Grant admin consent for MCP Server permissions ---
+foreach ($server in $McpServers) {
+    Write-Host "`nGranting admin consent for $($server.Name) permissions..." -ForegroundColor Cyan
+    $sp = Get-MgServicePrincipal -Filter "appId eq '$($server.AppId)'"
 
-$existingToolsGrant = Get-MgOauth2PermissionGrant -Filter "clientId eq '$($cliSp.Id)' and resourceId eq '$($toolsSp.Id)'" -ErrorAction SilentlyContinue | Select-Object -First 1
+    $existingGrant = Get-MgOauth2PermissionGrant -Filter "clientId eq '$($cliSp.Id)' and resourceId eq '$($sp.Id)'" -ErrorAction SilentlyContinue | Select-Object -First 1
 
-# Get the delegated scopes defined on Work IQ Tools
-$toolsScopes = ($toolsSp.Oauth2PermissionScopes | Select-Object -ExpandProperty Value) -join ' '
+    # Get the delegated scopes defined on this resource
+    $scopes = ($sp.Oauth2PermissionScopes | Select-Object -ExpandProperty Value) -join ' '
 
-if ($toolsScopes) {
-    if ($existingToolsGrant) {
-        Update-MgOauth2PermissionGrant -OAuth2PermissionGrantId $existingToolsGrant.Id -Scope $toolsScopes
-    } else {
-        New-MgOauth2PermissionGrant -BodyParameter @{
-            ClientId    = $cliSp.Id
-            ConsentType = 'AllPrincipals'
-            ResourceId  = $toolsSp.Id
-            Scope       = $toolsScopes
+    if ($scopes) {
+        if ($existingGrant) {
+            Update-MgOauth2PermissionGrant -OAuth2PermissionGrantId $existingGrant.Id -Scope $scopes
+        } else {
+            New-MgOauth2PermissionGrant -BodyParameter @{
+                ClientId    = $cliSp.Id
+                ConsentType = 'AllPrincipals'
+                ResourceId  = $sp.Id
+                Scope       = $scopes
+            }
         }
+        Write-Host "  Granted: $scopes" -ForegroundColor Green
+    } else {
+        Write-Host "  No delegated scopes found - skipping." -ForegroundColor Yellow
     }
-    Write-Host "Work IQ Tools permissions granted: $toolsScopes" -ForegroundColor Green
-} else {
-    Write-Host "No delegated scopes found on Work IQ Tools - skipping." -ForegroundColor Yellow
 }
 
 # --- Done ---
