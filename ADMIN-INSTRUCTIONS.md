@@ -19,6 +19,29 @@ https://login.microsoftonline.com/{your-tenant-id}/adminconsent?client_id=ba0816
 
 That's it! Users with Copilot licenses can now install and use Work IQ. See the [Work IQ README](https://github.com/microsoft/work-iq-mcp/blob/main/README.md) for end-user installation instructions.
 
+> **⚠️ Known Issue – "Access Denied" on Quick Start URL**
+>
+> The Quick Start URL above may fail with an **Access Denied** or **AADSTS650052** error in some tenants. This happens because the Work IQ CLI app registration includes permissions that target the Work IQ Tools MCP Server resource, and the service principal for that resource is not automatically provisioned in your tenant.
+>
+> **Diagnose (optional):** You can run the read-only verification script to see what's missing before making changes:
+>
+> ```powershell
+> .\scripts\Verify-WorkIQTenant.ps1
+> ```
+>
+> **Fix:** Run the [`Enable-WorkIQToolsForTenant.ps1`](scripts/Enable-WorkIQToolsForTenant.ps1) script to provision the missing service principals and grant admin consent in one step:
+>
+> ```powershell
+> # Prerequisites: Install-Module Microsoft.Graph -Scope CurrentUser
+> .\scripts\Enable-WorkIQToolsForTenant.ps1
+> ```
+>
+> The script requires the `Microsoft.Graph` PowerShell modules (auto-installed if missing) and one of: Global Admin, Cloud Application Admin, or Application Admin role. It will:
+> 1. Create all MCP Server service principals in your tenant (Work IQ Tools, Mail, Calendar, Teams, OneDrive, SharePoint, Word, Admin, Me, M365 Copilot)
+> 2. Create or verify the Work IQ CLI service principal
+> 3. Grant admin consent for all required Microsoft Graph permissions
+> 4. Grant admin consent for all MCP Server permissions
+
 ---
 
 ## Table of Contents
@@ -268,20 +291,30 @@ For additional security, create a Conditional Access policy:
 
 ### Common Issues and Solutions
 
-| Issue                                | Cause                        | Solution                                           |
-|--------------------------------------|------------------------------|----------------------------------------------------|
-| "Admin approval required" prompt     | Admin consent not granted    | Use the Quick Start URL or Step 3 methods          |
-| "Insufficient permissions" error     | Missing API permissions      | Verify all 7 required permissions are consented    |
-| Users can't sign in                  | Conditional Access blocking  | Review Conditional Access policies                 |
-| "License required" error             | User lacks Copilot license   | Assign Microsoft 365 Copilot license to user       |
-| Features not appearing               | License propagation delay    | Wait up to 24 hours after license assignment       |
+| Issue                                        | Cause                                                         | Solution                                                                 |
+|----------------------------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------|
+| "Access denied" / AADSTS error on consent URL | Work IQ Tools service principal not provisioned in tenant | Run [`Enable-WorkIQToolsForTenant.ps1`](scripts/Enable-WorkIQToolsForTenant.ps1) — see [Known Issue](#known-issue--access-denied-on-quick-start-url) |
+| Work IQ not visible in Enterprise Applications | Service principal not yet provisioned                         | Run [`Enable-WorkIQToolsForTenant.ps1`](scripts/Enable-WorkIQToolsForTenant.ps1) to provision it |
+| "Admin approval required" prompt             | Admin consent not granted                                     | Use the Quick Start URL or Step 3 methods                                |
+| "Insufficient permissions" error             | Missing API permissions                                       | Verify all 7 required permissions are consented                          |
+| Users can't sign in                          | Conditional Access blocking                                   | Review Conditional Access policies                                       |
+| "License required" error                     | User lacks Copilot license                                    | Assign Microsoft 365 Copilot license to user                             |
+| Features not appearing                       | License propagation delay                                     | Wait up to 24 hours after license assignment                             |
 
 ### Verify Admin Consent Status
+
+Run the verification script to check all service principals and permission grants:
+
+```powershell
+.\scripts\Verify-WorkIQTenant.ps1
+```
+
+Or verify manually:
 
 1. Go to **Microsoft Entra admin center** > **Enterprise applications**
 2. Find the Work IQ CLI application
 3. Select **Permissions**
-4. Verify all 7 permissions show "Granted for [Your Organization]"
+4. Verify all permissions show "Granted for [Your Organization]"
 
 ### Check User License Assignment
 
@@ -337,5 +370,5 @@ Work IQ provides access to sensitive organizational data including:
 
 ---
 
-**Document Version:** 1.3
-**Last Updated:** January 2026
+**Document Version:** 1.4
+**Last Updated:** March 2026
