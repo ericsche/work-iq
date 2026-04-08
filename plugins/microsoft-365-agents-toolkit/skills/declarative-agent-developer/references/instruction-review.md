@@ -254,11 +254,11 @@ Use this table to detect capability gaps in both directions — instructions tha
 | `GraphicArt` | Generate images from text | "create image", "generate art", "draw", "illustration", "visual" |
 | `CodeInterpreter` | Run Python code for analysis, math, visualizations | "calculate", "analyze data", "run code", "chart", "graph", "visualization", "Excel analysis" |
 | `Dataverse` | Search Dataverse tables | "Dataverse", "CRM", "Dynamics", "Power Platform data", "business data" |
-| `TeamsMessages` | Search Teams channels, chats, meeting chats | "Teams", "channels", "chat", "messages", "Teams messages", "mentions", "DMs" |
+| `TeamsMessages` | Search Teams channels, chats, meeting chats (messages only — NOT transcripts) | "Teams", "channels", "chat", "messages", "Teams messages", "mentions", "DMs" |
 | `Email` | Search user's email (and shared/group mailboxes) | "email", "inbox", "messages", "mail", "sent items", "flagged", "unread" |
 | `People` | Search people in the organization | "people", "org chart", "who is", "manager", "reports to", "birthday", "OOO", "colleagues" |
 | `ScenarioModels` | Use task-specific AI models | "model", "custom model", "specialized model" |
-| `Meetings` | Search calendar events and meeting details | "meetings", "calendar", "events", "schedule", "invites", "attendees", "join link" |
+| `Meetings` | Search calendar events, meeting details, **and meeting transcripts** | "meetings", "calendar", "events", "schedule", "invites", "attendees", "join link", "transcript", "what was discussed", "meeting notes", "recording" |
 | `EmbeddedKnowledge` | Use files bundled in the app package | "embedded files", "local files", "bundled docs" (not yet available) |
 
 > **How to use this table:** During Phase 2 (Comprehension Check) and Phase 3 (Diagnose, check A1 and A5), scan the instruction text for the keywords in the rightmost column. If a keyword appears but the corresponding capability is not in `capabilities[]` → flag as A5. If a capability is in the manifest but no keywords from its row appear in instructions → flag as A1.
