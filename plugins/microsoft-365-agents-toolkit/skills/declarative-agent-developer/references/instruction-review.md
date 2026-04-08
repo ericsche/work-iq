@@ -185,6 +185,7 @@ Run this checklist against any set of instructions. Each failed check is a speci
 | A2 | Every action/plugin has a matching section in instructions | Compare `actions[]` array against instruction text | Plugin exists but instructions don't reference it → model may never invoke it |
 | A3 | Each capability/action section has a WHEN clause | Look for conditional language: "when the user asks about...", "use X for Y" | Capability is mentioned but model has no trigger for using it |
 | A4 | Instructions provide decision logic, not tool descriptions | Check that instructions don't duplicate `description_for_model`, parameter lists, or schemas from plugin metadata | Token waste — this information is already available to the orchestrator |
+| A5 | Instructions don't assume capabilities that aren't configured | Read instruction text for keywords that imply a capability (see Capability Reference below). Cross-check each against `capabilities[]` in the manifest. | Instructions say "search email" but Email capability isn't configured → the agent will try and fail, or hallucinate |
 
 ### B. Process Structure
 
@@ -241,6 +242,31 @@ These apply specifically to agents with API plugins (actions).
 
 ---
 
+## Capability Reference (v1.6)
+
+Use this table to detect capability gaps in both directions — instructions that assume unconfigured capabilities, and configured capabilities that instructions ignore.
+
+| Capability name | What it does | Instruction keywords that imply this capability |
+|----------------|-------------|--------------------------------------------------|
+| `WebSearch` | Search the web for grounding | "search the web", "look online", "find on the internet", "web results", "current news" |
+| `OneDriveAndSharePoint` | Search SharePoint sites, OneDrive files, document libraries | "SharePoint", "OneDrive", "documents", "files", "shared files", "document library", "site" |
+| `GraphConnectors` | Search Copilot connectors (external data sources) | "Jira", "ServiceNow", "connector", "external system", "tickets", connector-specific names |
+| `GraphicArt` | Generate images from text | "create image", "generate art", "draw", "illustration", "visual" |
+| `CodeInterpreter` | Run Python code for analysis, math, visualizations | "calculate", "analyze data", "run code", "chart", "graph", "visualization", "Excel analysis" |
+| `Dataverse` | Search Dataverse tables | "Dataverse", "CRM", "Dynamics", "Power Platform data", "business data" |
+| `TeamsMessages` | Search Teams channels, chats, meeting chats | "Teams", "channels", "chat", "messages", "Teams messages", "mentions", "DMs" |
+| `Email` | Search user's email (and shared/group mailboxes) | "email", "inbox", "messages", "mail", "sent items", "flagged", "unread" |
+| `People` | Search people in the organization | "people", "org chart", "who is", "manager", "reports to", "birthday", "OOO", "colleagues" |
+| `ScenarioModels` | Use task-specific AI models | "model", "custom model", "specialized model" |
+| `Meetings` | Search calendar events and meeting details | "meetings", "calendar", "events", "schedule", "invites", "attendees", "join link" |
+| `EmbeddedKnowledge` | Use files bundled in the app package | "embedded files", "local files", "bundled docs" (not yet available) |
+
+> **How to use this table:** During Phase 2 (Comprehension Check) and Phase 3 (Diagnose, check A1 and A5), scan the instruction text for the keywords in the rightmost column. If a keyword appears but the corresponding capability is not in `capabilities[]` → flag as A5. If a capability is in the manifest but no keywords from its row appear in instructions → flag as A1.
+
+> **Advanced capability configuration:** Some capabilities support scoping (e.g. `OneDriveAndSharePoint` with `items_by_url`, `Email` with `shared_mailbox` and `folders`, `TeamsMessages` with specific channel URLs, `Meetings` with `items_by_id`, `People` with `include_related_content`). When reviewing instructions, also check whether scoping in the manifest aligns with what the instructions describe — e.g. instructions say "search all SharePoint" but the capability is scoped to a single site.
+
+---
+
 ## Review Workflow
 
 When reviewing instructions, follow this sequence:
@@ -273,6 +299,12 @@ Present your understanding in this structure:
 - [Capability 1] — used for [what scenario]
 - [Capability 2] — used for [what scenario]
 - [Any configured capability NOT mentioned in instructions — flag it]
+
+**Capability alignment:**
+| Capability | In manifest? | In instructions? | Gap |
+|------------|-------------|-----------------|-----|
+| [For each configured capability] | ✅ | ✅ or ❌ | [If ❌: instructions never reference this — model won't know when to use it] |
+| [For each capability implied by instructions but NOT configured] | ❌ | ✅ | [Instructions assume this exists but it's not configured — will fail or hallucinate] |
 
 **Tone / personality:** [What personality or communication style the instructions establish, if any]
 
