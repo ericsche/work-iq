@@ -99,7 +99,20 @@ User explicitly says "create a new agent", "scaffold", "start from scratch". The
 - ❌ Validating AFTER editing instead of detecting errors BEFORE editing
 - ❌ Mentioning malformed JSON only in a summary at the end instead of upfront
 
-### Gate 5: Valid Agent Project — Edit
+### Gate 5: Valid Project, User Reports Behavior Issues — Review
+
+`declarativeAgent.json` exists and is valid, but the user reports that the agent "doesn't work well", "gives generic answers", "doesn't use the right tool", "ignores capabilities", or shows behavior changes after a model update.
+
+**Trigger phrases:** "review instructions", "improve instructions", "my agent doesn't work", "agent gives generic answers", "agent doesn't follow the process", "agent changed after update"
+
+→ Proceed to [Instruction Review](instruction-review.md) — run the full 5-phase review workflow (Inventory → Comprehension Check → Diagnose → Report → Rewrite).
+
+**Rules:**
+- Follow the Detect → Inform → Ask protocol — diagnose first, present findings, wait for approval before rewriting
+- Do NOT skip directly to editing the instructions — run the diagnostic checklist first
+- Do NOT deploy until the review is complete and the user has approved changes
+
+### Gate 6: Valid Agent Project — Edit
 
 → Proceed to [Editing Workflow](editing-workflow.md)
 
@@ -113,6 +126,7 @@ User explicitly says "create a new agent", "scaffold", "start from scratch". The
 | No manifest, edit request | No `declarativeAgent.json`, user says "add capability" | Text-only: explain manifest is missing | ❌ Create files ❌ Scaffold ❌ "Help" by creating missing files |
 | Manifest missing fields | `declarativeAgent.json` missing `name`/`description`/`instructions` | List ALL missing fields, ASK user | ❌ Invent placeholders ❌ Auto-fill ❌ Run `npx -y --package @microsoft/m365agentstoolkit-cli atk provision` |
 | Manifest has errors | Manifest has structural/schema errors | Report ALL errors, suggest fixes, ask user | ❌ Silently fix ❌ Deploy ❌ Auto-correct |
+| Valid project, behavior issues | Valid manifest, user says "agent doesn't work well" | Run Instruction Review workflow (5 phases) | ❌ Jump to editing without diagnosis ❌ Deploy without review ❌ Rewrite without user approval |
 
 ---
 

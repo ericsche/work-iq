@@ -249,20 +249,61 @@ When reviewing instructions, follow this sequence:
 
 1. Read `declarativeAgent.json` — list all capabilities, actions, conversation starters, and the schema version
 2. Read `instructions.txt` (or inline instructions) — note the structure (or lack of it)
-3. If API plugins exist, read the `ai-plugin.json` to understand what functions are available and their parameter requirements
-4. If MCP plugins exist, read the plugin manifest to understand what tools are available
-5. Check the `version` field — note which GPT model era the instructions were likely written for
+3. **Measure instruction length** — count the characters in `instructions.txt`. If inline, count the `instructions` field value. Record the count against the **8,000-character limit**. If over → flag immediately as a blocking issue.
+4. If API plugins exist, read the `ai-plugin.json` to understand what functions are available and their parameter requirements
+5. If MCP plugins exist, read the plugin manifest to understand what tools are available
+6. Check the `version` field — note which GPT model era the instructions were likely written for
 
-### Phase 2: Diagnose
+> **Quick length check:** `wc -m appPackage/instructions.txt` (Unix/macOS/WSL) or `(Get-Content appPackage/instructions.txt -Raw).Length` (PowerShell)
+
+### Phase 2: Comprehension Check
+
+Before running any diagnostic, **explain back to the user what you understood** from reading all the files in Phase 1. This surfaces misunderstandings early and gives the user a chance to provide domain context you lack.
+
+Present your understanding in this structure:
+
+```
+## Here's what I understood about your agent
+
+**Purpose:** [One sentence — what this agent is for and who uses it]
+
+**Workflow:** [Summarize the decision process the instructions describe — what does the agent do first, when does it use which capability, what are the branching conditions?]
+
+**Capabilities used:**
+- [Capability 1] — used for [what scenario]
+- [Capability 2] — used for [what scenario]
+- [Any configured capability NOT mentioned in instructions — flag it]
+
+**Tone / personality:** [What personality or communication style the instructions establish, if any]
+
+**Gaps or things I'm unsure about:**
+- [Anything ambiguous, unclear, or that seems to be missing context]
+- [Domain-specific terms or processes you don't fully understand]
+```
+
+Then ask:
+> Does this match your intent? Is there anything I'm missing or misunderstanding about how this agent should work?
+
+**Wait for the user's response before proceeding to Phase 3.** The user's clarifications become additional context for the diagnostic — they may reveal that something you'd flag as a "gap" is intentional, or surface requirements that aren't written anywhere.
+
+> **Shortcut:** For proactive reviews triggered from the editing workflow (where the user didn't ask for a review), you may combine Phase 2 into a brief confirmation: "I see this agent is designed to [purpose]. The instructions cover [X, Y] but don't mention [Z capability]. Does that sound right?" — then proceed.
+
+### Phase 3: Diagnose
 
 Run the **full Diagnostic Checklist** — sections A (Capability Coverage), B (Process Structure), C (Anti-Patterns), D (GPT 5.2 Model Sensitivity), and E (API Plugin patterns, if applicable). Record every failed check.
 
-### Phase 3: Report
+For rapid assessment or when reviewing multiple agents, use the **Structured Evaluation Prompt** (see section below) — paste the current instructions into the template and run the automated checks. The eval prompt covers all checklist sections in a single pass.
+
+When scoring issues, factor in the user's clarifications from Phase 2 — if they confirmed a gap is intentional, downgrade or skip that check.
+
+### Phase 4: Report
 
 Present findings to the user in this format:
 
 ```
 ## Instruction Review
+
+**Instruction length:** [X] / 8,000 characters [✅ within limit | ⚠️ close (>6,500) | ❌ over limit]
 
 ### What's working
 - [List things that are correctly structured]
@@ -272,21 +313,32 @@ Present findings to the user in this format:
 |---|-------|----------|-------------|
 | 1 | C1 — Output-only | High | Instructions describe response format but have no workflow for finding answers |
 | 2 | A1 — Capability gap | High | Email capability is configured but never referenced in instructions |
-| 3 | C6 — Hallucination risk | Medium | "Include policy numbers" but no instruction on where to find them |
+| 3 | C11 — Token waste | Medium | Tool descriptions duplicated from plugin metadata — reclaim ~800 chars |
+| 4 | C6 — Hallucination risk | Medium | "Include policy numbers" but no instruction on where to find them |
 
 ### Recommended structure
 [Show the proposed skeleton with sections mapped to their capabilities]
+
+### Token budget impact
+[If rewrite is needed, estimate: current length → projected length after fix]
 ```
 
-### Phase 4: Rewrite (only after user confirms)
+### Phase 5: Rewrite (only after user confirms)
 
 Follow **Detect → Inform → Ask** — the same protocol used for JSON errors. Present the diagnosis, propose the fix, wait for approval before rewriting.
 
 When rewriting:
 - Preserve any existing content that passes the checklist
+- Incorporate the domain context and clarifications gathered in Phase 2 — use the user's own terminology and process descriptions
 - Do NOT invent domain-specific content (policy names, SharePoint URLs, process details) — ask the user
-- Structure using the process-focused template from this guide
-- Ensure every configured capability appears in the instructions with WHEN and HOW clauses
+- Structure using the process-focused pattern: OBJECTIVE → DECISION LOGIC → WORKFLOW → FAILURE HANDLING → RESPONSE RULES → SELF-CHECK
+- Ensure every configured capability appears in the instructions with WHEN clauses and chaining rules
+- **Do NOT add tool descriptions or parameters** — these are already in plugin metadata
+- **Measure the result** — verify the rewritten instructions are within 8,000 characters. If over, cut in this priority order:
+  1. Remove any remaining tool descriptions/parameter lists (C11)
+  2. Replace verbose tone blocks with a single output profile reference (D6)
+  3. Consolidate redundant workflow steps
+  4. If still over, ask the user what to prioritize
 
 ---
 

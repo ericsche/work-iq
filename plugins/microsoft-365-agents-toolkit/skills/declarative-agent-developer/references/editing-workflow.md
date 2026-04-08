@@ -78,7 +78,7 @@ When you add, remove, or modify ANY capability or plugin, you MUST complete ALL 
 
 ### Step 3: Edit JSON Manifest Files
 
-**⚠️ PRE-EDIT CHECK — Before making ANY edits, do BOTH of these:**
+**⚠️ PRE-EDIT CHECK — Before making ANY edits, do ALL of these:**
 
 1. **Check for malformed JSON**: Read `declarativeAgent.json` and verify it parses correctly. If it has syntax errors (missing commas, unclosed brackets, trailing commas, etc.):
    - **STOP** — do NOT proceed with your edit
@@ -88,6 +88,8 @@ When you add, remove, or modify ANY capability or plugin, you MUST complete ALL 
    - Then continue with the user's original request as a separate step
 
 2. **Check the schema version**: Read the `"version"` field in `declarativeAgent.json` (e.g., `"v1.4"`, `"v1.6"`). For EVERY feature you plan to add, verify it exists in that version using the [feature matrix](schema.md). If a requested feature requires a newer version → **STOP. Tell the user.** Offer to upgrade the version first.
+
+3. **Run a proactive instruction review** (if the edit touches instructions or capabilities): Before modifying instructions or adding/removing capabilities, run [Instruction Review](instruction-review.md) **Phase 1 (Inventory)**, **Phase 2 (Comprehension Check)**, and **Phase 3 (Diagnose)** against the current instructions. This catches existing problems before you add to them. For Phase 2, use the brief confirmation shortcut ("I see this agent is designed to [purpose]…") since this is a proactive check. If the review finds high-severity issues (C1, C3, C11, D1-D8), inform the user and offer to fix them as part of the current edit.
 
 **⛔ NEVER invent placeholder values.** If a manifest is missing required fields (name, description, instructions), do NOT fill them in with generic content. Ask the user to provide values. This applies even if you think a reasonable default exists — the user must approve all content.
 

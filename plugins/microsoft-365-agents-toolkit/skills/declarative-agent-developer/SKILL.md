@@ -36,6 +36,7 @@ description: >
 | No manifest, user wants to edit/deploy | **Reject** | Text-only response. Explain manifest is missing. |
 | No manifest, user wants new project | **Scaffold** | → [Scaffolding Workflow](references/scaffolding-workflow.md) |
 | Manifest exists with errors | **Fix** | Detect → Inform → Ask (see below). Do NOT deploy. |
+| Valid project, user reports behavior issues | **Review** | → [Instruction Review](references/instruction-review.md) — run the full 5-phase review workflow |
 | Valid agent project | **Edit** | → [Editing Workflow](references/editing-workflow.md) |
 
 > **Detailed gate rules, examples, and anti-patterns:** [Workspace Gates](references/workspace-gates.md)
