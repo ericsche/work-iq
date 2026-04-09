@@ -11,7 +11,10 @@ description: >
   "fix my agent manifest", "edit my agent", "modify my agent",
   "localize this agent", "localize my agent", "add localization",
   "translate my agent", "add a language", "multi-language agent",
-  "add an API plugin", "add an MCP plugin", "add OAuth to my plugin", "add logo to my agent"
+  "add an API plugin", "add an MCP plugin", "add OAuth to my plugin", "add logo to my agent",
+  "review instructions", "improve instructions", "audit instructions",
+  "my agent doesn't work well", "agent gives generic answers",
+  "agent doesn't use the right tool", "fix my instructions"
 ---
 
 # M365 Agent Developer
@@ -33,6 +36,7 @@ description: >
 | No manifest, user wants to edit/deploy | **Reject** | Text-only response. Explain manifest is missing. |
 | No manifest, user wants new project | **Scaffold** | → [Scaffolding Workflow](references/scaffolding-workflow.md) |
 | Manifest exists with errors | **Fix** | Detect → Inform → Ask (see below). Do NOT deploy. |
+| Valid project, user reports behavior issues | **Review** | → [Instruction Review](references/instruction-review.md) — run the full 5-phase review workflow |
 | Valid agent project | **Edit** | → [Editing Workflow](references/editing-workflow.md) |
 
 > **Detailed gate rules, examples, and anti-patterns:** [Workspace Gates](references/workspace-gates.md)
@@ -72,6 +76,8 @@ When you encounter ANY problem (missing files, malformed JSON, validation errors
 | Adding an API plugin | [API Plugins](references/api-plugins.md) |
 | Adding an MCP server | [MCP Plugin](references/mcp-plugin.md) |
 | Adding OAuth to an MCP or API plugin | [Authentication](references/authentication.md) |
+| Reviewing or improving existing agent instructions | [Instruction Review](references/instruction-review.md) |
+| User reports agent gives generic/wrong answers | [Instruction Review](references/instruction-review.md) |
 | Localizing an agent into multiple languages | [Localization](references/localization.md) |
 | Adding a new language to an already-localized agent | [Localization](references/localization.md) |
 | Writing agent instructions | [Conversation Design](references/conversation-design.md) |
@@ -148,9 +154,12 @@ When the user mentions an MCP server URL, follow the [MCP Plugin workflow](refer
 ### 6. Always Update Instructions & Starters After Changes
 
 Adding a capability or plugin without updating instructions is incomplete. After ANY change:
-1. Update instructions to describe the new/changed functionality
-2. Add at least 1 conversation starter per added capability/plugin
-3. Remove starters that reference removed capabilities
+1. Update instructions to describe the new/changed functionality — every data source should have clear intent coverage (WHEN and WHY to use it) per the [Instruction Review](references/instruction-review.md) quality bar. Built-in capabilities don't need exact names; actions/plugins should be named.
+2. **Do NOT list tool names, descriptions, or parameters in instructions** — these are already in the plugin metadata (`ai-plugin.json`, MCP manifests, capability config). Instructions should contain decision logic only: WHEN to use each tool, chaining rules, and failure handling.
+3. **Stay within the 8,000-character instruction limit** — if close to the limit, cut tool descriptions first
+4. Add at least 1 conversation starter per added capability/plugin
+5. Remove starters that reference removed capabilities
+6. Run the [Diagnostic Checklist](references/instruction-review.md) against the updated instructions to verify quality
 
 ### 7. App Name Requirement
 
@@ -163,7 +172,8 @@ Always update the app name and description to something meaningful. Never leave 
 ### Shared
 - **[Authentication](references/authentication.md)** — OAuth discovery, credentials, oauth/register lifecycle, OAuthPluginVault
 - **[Best Practices](references/best-practices.md)** — Security, performance, testing, compliance
-- **[Conversation Design](references/conversation-design.md)** — Instructions and conversation starters
+- **[Conversation Design](references/conversation-design.md)** — Authoring instructions and conversation starters from scratch
+- **[Instruction Review](references/instruction-review.md)** — Auditing, diagnosing, and improving existing instructions; anti-pattern detection; before/after rewrites
 - **[Deployment](references/deployment.md)** — ATK CLI workflows, environments, CI/CD
 - **[Localization](references/localization.md)** — Multi-language support, tokenized manifests, language files
 - **[Workspace Gates](references/workspace-gates.md)** — Detailed gate rules, examples, anti-patterns

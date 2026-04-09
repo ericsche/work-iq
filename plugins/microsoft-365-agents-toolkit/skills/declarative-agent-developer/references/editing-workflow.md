@@ -78,7 +78,7 @@ When you add, remove, or modify ANY capability or plugin, you MUST complete ALL 
 
 ### Step 3: Edit JSON Manifest Files
 
-**⚠️ PRE-EDIT CHECK — Before making ANY edits, do BOTH of these:**
+**⚠️ PRE-EDIT CHECK — Before making ANY edits, do ALL of these:**
 
 1. **Check for malformed JSON**: Read `declarativeAgent.json` and verify it parses correctly. If it has syntax errors (missing commas, unclosed brackets, trailing commas, etc.):
    - **STOP** — do NOT proceed with your edit
@@ -88,6 +88,8 @@ When you add, remove, or modify ANY capability or plugin, you MUST complete ALL 
    - Then continue with the user's original request as a separate step
 
 2. **Check the schema version**: Read the `"version"` field in `declarativeAgent.json` (e.g., `"v1.4"`, `"v1.6"`). For EVERY feature you plan to add, verify it exists in that version using the [feature matrix](schema.md). If a requested feature requires a newer version → **STOP. Tell the user.** Offer to upgrade the version first.
+
+3. **Run a proactive instruction review** (if the edit touches instructions or capabilities): Before modifying instructions or adding/removing capabilities, run [Instruction Review](instruction-review.md) **Phase 1 (Inventory)**, **Phase 2 (Comprehension Check)**, and **Phase 3 (Diagnose)** against the current instructions. This catches existing problems before you add to them. For Phase 2, use the brief confirmation shortcut ("I see this agent is designed to [purpose]…") since this is a proactive check. If the review finds high-severity issues (C1, C3, C11, D1-D8), inform the user and offer to fix them as part of the current edit.
 
 **⛔ NEVER invent placeholder values.** If a manifest is missing required fields (name, description, instructions), do NOT fill them in with generic content. Ask the user to provide values. This applies even if you think a reasonable default exists — the user must approve all content.
 
@@ -120,13 +122,17 @@ npx -y --package @microsoft/m365agentstoolkit-cli atk add action --api-plugin-ty
 4. **Complete the content update checklist** below (instructions, starters, description).
 
 **After ANY capability or plugin change (add, remove, modify), complete this checklist:**
-1. ☐ **Update instructions** — Add a section describing the new/changed capability. For removals, delete all references.
-2. ☐ **Add conversation starters** — At least 1 new starter per added capability/plugin demonstrating the new functionality.
-3. ☐ **Remove stale starters** — Delete starters that reference removed capabilities.
-4. ☐ **Update `manifest.json` description** if the agent's purpose has expanded.
-5. ☐ **Review existing instructions** for stale references to removed capabilities.
+1. ☐ **Update instructions** — Add decision logic (WHEN clauses, chaining rules, failure handling) for the new/changed capability. For removals, delete all references. **Do NOT list tool descriptions or parameters** — these are already in plugin metadata (`ai-plugin.json`, MCP manifests, capability config). Instructions should contain decision logic only.
+2. ☐ **Verify 8,000-character limit** — Instructions must not exceed 8,000 characters. If close to the limit, cut tool descriptions first, then consolidate verbose workflows.
+3. ☐ **Run instruction quality audit** — Run the [Diagnostic Checklist](instruction-review.md) against the updated instructions. Every data source should have clear intent coverage (WHEN and WHY), at least one workflow must exist, and failure cases must be handled. Built-in capabilities don't need exact names; actions/plugins should be named. If any check fails, fix it before deploying.
+4. ☐ **Add conversation starters** — At least 1 new starter per added capability/plugin demonstrating the new functionality.
+5. ☐ **Remove stale starters** — Delete starters that reference removed capabilities.
+6. ☐ **Update `manifest.json` description** if the agent's purpose has expanded.
+7. ☐ **Review existing instructions** for stale references to removed capabilities.
 
 **This checklist is NOT optional.** Adding a capability without updating instructions and starters is incomplete work.
+
+**⚠️ Instruction quality matters as much as JSON correctness.** Output-focused instructions (tone, format, style only) are a known failure pattern — they cause agents to give generic answers and ignore configured capabilities. Listing tool descriptions and parameters in instructions wastes the 8,000-character budget — this metadata is already available to the orchestrator. See [Instruction Review](instruction-review.md) for the anti-pattern catalog and before/after rewrites.
 
 **Reference:** [schema.md](schema.md) for proper manifest structure
 **Reference:** [api-plugins.md](api-plugins.md) for adaptive card enhancement guidelines after adding a plugin

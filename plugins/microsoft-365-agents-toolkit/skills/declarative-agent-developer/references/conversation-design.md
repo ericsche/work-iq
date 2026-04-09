@@ -6,6 +6,14 @@
 
 The `instructions` field in `declarativeAgent.json` references an external `instructions.txt` file. This keeps the JSON manifest clean and makes instructions easy to edit. This is the most critical aspect of agent design.
 
+### Instruction Limits and Token Budget
+
+**Instructions are limited to 8,000 characters.** Every character counts — be concise and deliberate about what goes into `instructions.txt`.
+
+**⛔ Do NOT duplicate tool/capability metadata in instructions.** Tool names, descriptions, parameters, and schemas are already available to the orchestrator through `ai-plugin.json` (`description_for_model`), MCP plugin manifests (`mcp_tool_description.tools[]`), and capability configuration in the agent manifest. Listing them in instructions wastes the 8,000-character budget.
+
+Instructions should contain **decision logic only**: WHEN to use each capability, HOW to chain them, and WHAT to do on failure. See [Instruction Review](instruction-review.md) for the full anti-pattern catalog.
+
 ### Instruction Structure
 
 In `declarativeAgent.json`, reference the instructions file using `${{file:instructions.txt}}`:
@@ -92,17 +100,20 @@ Use [Markdown](https://www.markdownguide.org/basic-syntax) for emphasis and clar
 - Highlight tool or system names with backticks (e.g., `Jira`, `ServiceNow`)
 - Make critical instructions bold with `**`
 
-### 7. Explicitly Reference Capabilities, Knowledge, and Actions
+### 7. Provide Clear Intent for Each Data Source
 
-Clearly call out the names of actions, capabilities, or knowledge sources at each step:
+Describe the purpose and context for each data source the agent can use. You don't need to use the exact capability names from the manifest — M365 Copilot maps them internally. What matters is clear intent: **when** and **why** each data source should be used.
 
-- **Actions**: "Use `Jira` to fetch tickets."
-- **Copilot connector knowledge**: "Use `ServiceNow KB` for help articles."
-- **SharePoint knowledge**: "Reference SharePoint or OneDrive internal documents."
-- **Email**: "Check user emails for relevant information."
-- **Teams messages**: "Search Teams chat history."
+- **Actions/plugins**: Reference by name — "Use `Jira` to fetch tickets."
+- **Copilot connector knowledge**: Reference by connector name — "Use `ServiceNow KB` for help articles."
+- **SharePoint/OneDrive**: Describe the data source — "Search internal HR policy documents" or "Reference company documents in SharePoint."
+- **Email**: Describe the scenario — "Check user emails for relevant information."
+- **Teams messages**: "Search Teams channels and chat messages." (messages only — NOT transcripts)
+- **Meetings**: "Check calendar events, attendees, and meeting transcripts." (transcripts come from `Meetings`, not `TeamsMessages`)
 - **Code interpreter**: "Use code interpreter to generate charts."
-- **People knowledge**: "Use people knowledge to fetch user email."
+- **People knowledge**: "Look up people in the organization for contact info."
+
+> **Common mistake:** Assuming meeting transcripts are part of `TeamsMessages`. Transcripts are retrieved through the `Meetings` capability. `TeamsMessages` covers channel posts, DMs, and meeting chat messages only. See the [Capability Reference](instruction-review.md#capability-reference-v16) for the full mapping.
 
 ### 8. Provide Examples
 
@@ -373,6 +384,8 @@ Write starters as users would naturally speak:
 ---
 
 ## Avoiding Common Prompt Failures
+
+> **Reviewing existing instructions?** If you are auditing or improving instructions that already exist (rather than writing from scratch), use the [Instruction Review](instruction-review.md) guide instead. It provides a diagnostic checklist, named anti-patterns, and before/after rewrite examples.
 
 | Problem | Solution |
 |---------|----------|
